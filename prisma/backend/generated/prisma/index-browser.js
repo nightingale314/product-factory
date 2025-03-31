@@ -117,18 +117,47 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.AccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  provider: 'provider',
+  providerAccountId: 'providerAccountId',
+  refresh_token: 'refresh_token',
+  access_token: 'access_token',
+  expires_at: 'expires_at',
+  token_type: 'token_type',
+  scope: 'scope',
+  id_token: 'id_token',
+  session_state: 'session_state'
+};
+
+exports.Prisma.SessionScalarFieldEnum = {
+  id: 'id',
+  sessionToken: 'sessionToken',
+  userId: 'userId',
+  expires: 'expires'
+};
+
+exports.Prisma.VerificationTokenScalarFieldEnum = {
+  identifier: 'identifier',
+  token: 'token',
+  expires: 'expires'
+};
+
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  emailVerified: 'emailVerified',
+  image: 'image',
+  passwordHash: 'passwordHash',
+  supplierId: 'supplierId'
+};
+
 exports.Prisma.SupplierScalarFieldEnum = {
   id: 'id',
   name: 'name'
-};
-
-exports.Prisma.SupplierUserScalarFieldEnum = {
-  id: 'id',
-  email: 'email',
-  name: 'name',
-  supplier_id: 'supplier_id',
-  password_hash: 'password_hash',
-  created_at: 'created_at'
 };
 
 exports.Prisma.SortOrder = {
@@ -148,8 +177,11 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  Supplier: 'Supplier',
-  SupplierUser: 'SupplierUser'
+  Account: 'Account',
+  Session: 'Session',
+  VerificationToken: 'VerificationToken',
+  User: 'User',
+  Supplier: 'Supplier'
 };
 
 /**
