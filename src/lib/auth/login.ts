@@ -1,15 +1,21 @@
+import { ServerErrorCode } from "@/constants/common";
 import { verifyPassword } from "@/lib/auth/password";
-import { User } from "../../../prisma/backend/generated/prisma";
 import prisma from "@/lib/prisma";
+import { User } from "@prisma/client";
 
-export async function login(credentials: unknown): Promise<User | null> {
+export async function login(
+  credentials: unknown
+): Promise<{ user: User | null; errorCode: ServerErrorCode }> {
   if (
     !credentials ||
     typeof credentials !== "object" ||
     !("email" in credentials) ||
     !("password" in credentials)
   ) {
-    return null;
+    return {
+      user: null,
+      errorCode: ServerErrorCode.AUTH_INVALID_CREDENTIALS_SCHEMA,
+    };
   }
 
   const { email, password } = credentials as {
@@ -18,23 +24,33 @@ export async function login(credentials: unknown): Promise<User | null> {
   };
 
   if (!email || !password) {
-    return null;
+    return {
+      user: null,
+      errorCode: ServerErrorCode.AUTH_INVALID_CREDENTIALS,
+    };
   }
 
   const user = await prisma.user.findUnique({
     where: { email },
   });
 
-  console.log({ user });
-
   if (!user || !user.passwordHash) {
-    return null;
+    return {
+      user: null,
+      errorCode: ServerErrorCode.AUTH_INVALID_CREDENTIALS,
+    };
   }
 
   const isValid = await verifyPassword(password, user.passwordHash);
   if (!isValid) {
-    return null;
+    return {
+      user: null,
+      errorCode: ServerErrorCode.AUTH_INVALID_CREDENTIALS,
+    };
   }
 
-  return user;
+  return {
+    user,
+    errorCode: ServerErrorCode.SUCCESS,
+  };
 }

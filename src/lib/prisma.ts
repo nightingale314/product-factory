@@ -1,9 +1,9 @@
 import "dotenv/config";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { Pool, neonConfig } from "@neondatabase/serverless";
-import { PrismaClient } from "../../prisma/backend/generated/prisma";
 
 import ws from "ws";
+import { PrismaClient } from "@prisma/client";
 neonConfig.webSocketConstructor = ws;
 
 // To work in edge enviro nments (Cloudflare Workers, Vercel Edge, etc.), enable querying over fetch

@@ -1,19 +1,27 @@
-import { signIn } from "@/lib/auth/auth";
+"use client";
+
+import { loginAction } from "@/actions/auth/loginAction";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const loginUser = async (formData: FormData) => {
-    "use server";
-    const email = formData.get("email");
-    const password = formData.get("password");
+  const router = useRouter();
 
-    await signIn("credentials", {
-      email,
-      password,
-    });
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    try {
+      const result = await loginAction(formData);
+      if (result.success) {
+        router.push("/");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
-    <form action={loginUser}>
+    <form onSubmit={handleLogin}>
       <label htmlFor="email">Email</label>
       <input name="email" type="email" />
       <label htmlFor="password">Password</label>
