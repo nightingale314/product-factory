@@ -1,11 +1,12 @@
 import { auth } from "@/lib/auth/auth";
+import { routes } from "@/constants/routes";
 import { redirect } from "next/navigation";
 
-export default async function Home() {
+export const Home = async () => {
   const session = await auth();
 
   if (!session?.user) {
-    redirect("/login");
+    redirect(routes.login);
   }
 
   return (
@@ -13,4 +14,6 @@ export default async function Home() {
       Logged in {session.user.email}
     </div>
   );
-}
+};
+
+export default Home;

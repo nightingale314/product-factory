@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Product Hub",
-  description: "AI Product Hub",
+  title: "Product Data Platform",
+  description: "Product Data Platform",
 };
 
 export default function RootLayout({
@@ -19,7 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+      <body className={`${inter.variable} antialiased`}>
+        <main>{children}</main>
+      </body>
     </html>
   );
 }
