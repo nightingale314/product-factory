@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Product Data Platform",
-  description: "Product Data Platform",
+  title: "Product Factory",
+  description: "Product Factory",
 };
 
 export default function RootLayout({
