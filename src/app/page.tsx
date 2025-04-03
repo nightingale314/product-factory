@@ -9,11 +9,7 @@ export const Home = async () => {
     redirect(routes.login);
   }
 
-  return (
-    <div className="font-[family-name:var(--font-inter)]">
-      Logged in {session.user.email}
-    </div>
-  );
+  redirect(routes.products);
 };
 
 export default Home;
