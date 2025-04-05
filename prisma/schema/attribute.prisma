@@ -1,0 +1,57 @@
+enum AttributeType {
+  SHORT_TEXT // string 
+  LONG_TEXT // string
+  NUMBER // number
+  BOOLEAN // boolean
+  DATE // date
+  DATETIME // date and time
+  SINGLE_SELECT //  {id: string, name: string}
+  MULTI_SELECT // {id: stirng, name: string}}[]
+  HTML // string
+  MEASURE // { value: number, unit: string }
+  MEDIA // string[]
+}
+
+model AttributeMeasureConfig {
+  id String @id @default(cuid())
+  attributeId String
+  name String
+  unit String[]
+  attribute Attribute @relation(fields: [attributeId], references: [id])
+
+  @@map("attribute_measure")
+}
+
+model AttributeOptionConfig {
+  id String @id @default(cuid())
+  attributeId String
+  name String
+  value String
+  attribute Attribute @relation(fields: [attributeId], references: [id])
+
+  @@map("attribute_option")
+}
+
+
+model Attribute {
+  id String @id @default(cuid())
+  supplierId Int
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String
+  type AttributeType
+  description String
+  required Boolean
+  enrichmentInstructions String?
+  enrichmentEnabled Boolean
+
+  productAttributes ProductAttribute[]
+  measureConfig AttributeMeasureConfig[]
+  selectConfig AttributeOptionConfig[]
+
+  @@index([supplierId])
+  @@index([name])
+  @@index([type])
+  @@map("attributes")
+}

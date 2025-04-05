@@ -1,0 +1,11 @@
+model Supplier {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+  name String
+  users User[]
+  attributes Attribute[]
+  products Product[]
+
+  @@map("suppliers")
+}
