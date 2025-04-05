@@ -54,7 +54,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   jwt: {
     encode: async function (params) {
-      console.log("encode", params);
       if (params.token?.credentials) {
         const sessionToken = uuid();
 
