@@ -5,8 +5,8 @@ enum AttributeType {
   BOOLEAN // boolean
   DATE // date
   DATETIME // date and time
-  SINGLE_SELECT //  {id: string, name: string}
-  MULTI_SELECT // {id: stirng, name: string}}[]
+  SINGLE_SELECT //  string
+  MULTI_SELECT // string[]
   HTML // string
   MEASURE // { value: number, unit: string }
   MEDIA // string[]
@@ -14,22 +14,10 @@ enum AttributeType {
 
 model AttributeMeasureConfig {
   id String @id @default(cuid())
-  attributeId String
-  name String
   unit String[]
-  attribute Attribute @relation(fields: [attributeId], references: [id])
+  attribute Attribute @relation(fields: [id], references: [id], onDelete: Cascade)
 
   @@map("attribute_measure")
-}
-
-model AttributeOptionConfig {
-  id String @id @default(cuid())
-  attributeId String
-  name String
-  value String
-  attribute Attribute @relation(fields: [attributeId], references: [id])
-
-  @@map("attribute_option")
 }
 
 
@@ -41,14 +29,14 @@ model Attribute {
   updatedAt DateTime @updatedAt
   name String
   type AttributeType
-  description String
+  description String?
   required Boolean
   enrichmentInstructions String?
   enrichmentEnabled Boolean
 
+  selectOptions String[]
+  measureConfig AttributeMeasureConfig?
   productAttributes ProductAttribute[]
-  measureConfig AttributeMeasureConfig[]
-  selectConfig AttributeOptionConfig[]
 
   @@index([supplierId])
   @@index([name])

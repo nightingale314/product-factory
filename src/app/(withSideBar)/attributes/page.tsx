@@ -1,3 +1,3 @@
-export default function AttributesPage() {
-  return <div>Attributes</div>;
-}
+import { AttributesIndex } from "@/components/pages/attributes";
+
+export default AttributesIndex;

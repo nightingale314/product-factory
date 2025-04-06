@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/ui/sidebar/AppSidebar";
+import { AppSidebar } from "@/components/composition/sidebar/AppSidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
