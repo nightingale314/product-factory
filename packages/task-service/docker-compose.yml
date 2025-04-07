@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  task-service:
+    build:
+      context: ../../
+      dockerfile: packages/task-service/Dockerfile.dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ../../packages/task-service:/app/packages/task-service
+      - /app/node_modules
+      - /app/packages/task-service/node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    command: sh -c "pnpm --filter @product-factory/task-service install && pnpm --filter @product-factory/task-service dev"
