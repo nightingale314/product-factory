@@ -1,6 +1,6 @@
 "use server";
 
-import { ServerErrorCode } from "@/constants/common";
+import { ServerErrorCode } from "@/enums/common";
 import { routes } from "@/constants/routes";
 import { signIn } from "@/lib/auth/auth";
 import { serverLogger } from "@/lib/logger/serverLogger";

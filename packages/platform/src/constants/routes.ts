@@ -5,3 +5,7 @@ export const routes = {
   attributes: "/attributes",
   enrichment: "/enrichment",
 };
+
+export const apiRoutes = {
+  attributes: "/api/attributes",
+};

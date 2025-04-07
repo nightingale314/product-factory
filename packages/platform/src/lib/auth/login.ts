@@ -1,4 +1,4 @@
-import { ServerErrorCode } from "@/constants/common";
+import { ServerErrorCode } from "@/enums/common";
 import { verifyPassword } from "@/lib/auth/password";
 import prisma from "@/lib/prisma";
 import { User } from "@prisma/client";

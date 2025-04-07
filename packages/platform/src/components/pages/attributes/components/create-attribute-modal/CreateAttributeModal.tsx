@@ -17,12 +17,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateAttributeSchema } from "@/schemas/attribute/createAttribute";
 import { FormProvider, useForm } from "react-hook-form";
 import { AttributeType } from "@prisma/client";
-import { createAttributeAction } from "@/actions/attributes/createAttributeAction";
-import { ServerErrorCode } from "@/constants/common";
+import { createAttributeAction } from "@/server-actions/attributes/createAttributeAction";
+import { ServerErrorCode } from "@/enums/common";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function CreateAttributeModal() {
+interface CreateAttributeModalProps {
+  onCreateSuccess?: () => void;
+}
+
+export function CreateAttributeModal({
+  onCreateSuccess,
+}: CreateAttributeModalProps) {
   const [open, setOpen] = useState(false);
   const form = useForm<CreateAttributeSchema>({
     resolver: zodResolver(createAttributeSchema),
@@ -37,6 +43,7 @@ export function CreateAttributeModal() {
     try {
       const response = await createAttributeAction(input);
       if (response.errorCode === ServerErrorCode.SUCCESS) {
+        onCreateSuccess?.();
         toast.success(`${input.name} created successfully`);
         setOpen(false);
       } else {
@@ -50,6 +57,9 @@ export function CreateAttributeModal() {
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       form.reset();
+      setOpen(false);
+    } else {
+      setOpen(true);
     }
   };
 

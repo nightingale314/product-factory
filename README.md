@@ -20,6 +20,10 @@ Run the FE development server
 pnpm run dev:platform
 ```
 
+## NextJS architecture design
+
+1. Server actions are used for mutations whereas API Route handlers are used for data fetching. Reason is because data fetching is a HTTP network request that can be cached easily with conventional methods.
+
 ## Scalability notes
 
 1. Requirements mentioned products volume per supplier ranging from 10k to 1M. Assuming worst case operational context, where clients are primarily enterprises with 1M products volume and has has 1000 attributes in their set up. Their total product attribute row count will be around 1B assuming each product has 1000 attributes assigned. Purely using this design will result in the ProductAttribute table to grow very large, causing issues in index maintenance and query performance.

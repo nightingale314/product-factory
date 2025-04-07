@@ -1,12 +1,18 @@
-import { PageHeader } from "@/components/composition/page-header";
-import { CreateAttributeModal } from "./components/create-attribute-modal/CreateAttributeModal";
+import { AttributeTable } from "./components/attribute-table";
+import { AttributeTableSkeleton } from "./components/attribute-table/Skeleton";
+import { Suspense } from "react";
+import { AttributePageHeader } from "./components/AttributePageHeader";
+import { PageProps } from "@/types/common";
 
-export const AttributesIndex = () => {
+export const AttributesIndex = async ({ searchParams }: PageProps) => {
   return (
     <div className="flex flex-col grow w-full">
-      <PageHeader title="Attributes">
-        <CreateAttributeModal />
-      </PageHeader>
+      <AttributePageHeader />
+      <div className="flex flex-col grow max-w-full px-4 py-6">
+        <Suspense fallback={<AttributeTableSkeleton />}>
+          <AttributeTable searchParams={searchParams} />
+        </Suspense>
+      </div>
     </div>
   );
 };

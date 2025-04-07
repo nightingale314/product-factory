@@ -1,14 +1,17 @@
 "use server";
 
-import { ServerErrorCode } from "@/constants/common";
+import { ServerErrorCode } from "@/enums/common";
 import { getAuthSession } from "@/lib/auth/getAuthSession";
 import { serverLogger } from "@/lib/logger/serverLogger";
 import { CreateAttributeSchema } from "@/schemas/attribute/createAttribute";
-import { PrismaClient } from "@prisma/client";
+import { ServerResponse } from "@/types/common";
+import { Attribute, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function createAttributeAction(input: CreateAttributeSchema) {
+export async function createAttributeAction(
+  input: CreateAttributeSchema
+): Promise<ServerResponse<Attribute>> {
   const session = await getAuthSession();
 
   try {
@@ -30,7 +33,6 @@ export async function createAttributeAction(input: CreateAttributeSchema) {
 
     return {
       errorCode: ServerErrorCode.SUCCESS,
-      message: "Attribute created successfully",
       data: response,
     };
   } catch (error) {
@@ -39,7 +41,8 @@ export async function createAttributeAction(input: CreateAttributeSchema) {
 
     return {
       message: "Failed to create attribute",
-      errorCode: ServerErrorCode.AUTH_INVALID_CREDENTIALS,
+      errorCode: ServerErrorCode.UNEXPECTED_ERROR,
+      data: null,
     };
   }
 }

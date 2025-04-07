@@ -1,6 +1,6 @@
 "use client";
 
-import { loginAction } from "@/actions/auth/loginAction";
+import { loginAction } from "@/server-actions/auth/loginAction";
 import { Button } from "@/components/ui/button";
 import { loginSchema, LoginSchema } from "@/schemas/auth/login";
 import { FormField } from "@/components/composition/form/form-field";

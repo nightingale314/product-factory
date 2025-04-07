@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 import { login } from "./login";
 import { v4 as uuid } from "uuid";
 import { encode as defaultEncode } from "next-auth/jwt";
-import { ServerErrorCode } from "@/constants/common";
+import { ServerErrorCode } from "@/enums/common";
 
 class CustomError extends CredentialsSignin {
   constructor(code: string) {
