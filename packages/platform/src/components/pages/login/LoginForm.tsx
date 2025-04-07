@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 export const LoginForm = () => {
   const {
     handleSubmit,
+    register,
     formState: { errors, isSubmitting },
   } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
@@ -30,12 +31,12 @@ export const LoginForm = () => {
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-1">
             <FormField name="email" label="Email" errors={errors}>
-              <Input />
+              <Input {...register("email")} />
             </FormField>
           </div>
           <div className="flex flex-col gap-1">
             <FormField name="password" label="Password" errors={errors}>
-              <Input />
+              <Input {...register("password")} />
             </FormField>
           </div>
           <Button
