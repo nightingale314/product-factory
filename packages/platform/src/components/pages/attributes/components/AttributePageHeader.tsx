@@ -1,7 +1,7 @@
 "use client";
 
 import { PageHeader } from "@/components/composition/page-header";
-import { CreateAttributeModal } from "./create-attribute-modal/CreateAttributeModal";
+import { CreateAttributeModal } from "./attribute-modal/create-attribute-modal/CreateAttributeModal";
 import { revalidateAction } from "@/server-actions/revalidate";
 
 export const AttributePageHeader = () => {

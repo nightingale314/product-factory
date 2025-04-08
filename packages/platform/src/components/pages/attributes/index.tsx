@@ -8,7 +8,7 @@ export const AttributesIndex = async ({ searchParams }: PageProps) => {
   return (
     <div className="flex flex-col grow w-full">
       <AttributePageHeader />
-      <div className="flex flex-col grow max-w-full px-4 py-6">
+      <div className="flex flex-col grow max-w-full p-6">
         <Suspense fallback={<AttributeTableSkeleton />}>
           <AttributeTable searchParams={searchParams} />
         </Suspense>

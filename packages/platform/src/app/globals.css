@@ -153,3 +153,9 @@
     vector-effect: non-scaling-stroke;
   }
 }
+
+@layer components {
+  .text-link {
+    @apply hover:text-[#7AA4FF] cursor-pointer;
+  }
+}

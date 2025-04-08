@@ -1,4 +1,3 @@
-import { columns } from "@/components/pages/attributes/components/attribute-table/Columns";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { flexRender, Table } from "@tanstack/react-table";
 
@@ -21,7 +20,10 @@ export const DataTableBody = <TData,>({ table }: DataTableBodyProps<TData>) => {
         ))
       ) : (
         <TableRow>
-          <TableCell colSpan={columns.length} className="h-24 text-center">
+          <TableCell
+            colSpan={table.getVisibleFlatColumns().length}
+            className="h-24 text-center"
+          >
             No results.
           </TableCell>
         </TableRow>

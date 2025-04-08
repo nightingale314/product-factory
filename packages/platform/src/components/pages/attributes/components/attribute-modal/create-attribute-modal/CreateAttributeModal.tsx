@@ -66,7 +66,7 @@ export function CreateAttributeModal({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button>
           <PlusIcon />
           Create Attribute
         </Button>

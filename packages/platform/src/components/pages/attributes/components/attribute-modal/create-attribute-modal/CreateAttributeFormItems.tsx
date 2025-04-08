@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CreateAttributeSchema } from "@/schemas/attribute/createAttribute";
 import { AttributeType } from "@prisma/client";
 import { Controller, useFormContext } from "react-hook-form";
-import { SelectAttributeConfig } from "./SelectAttributeConfig";
+import { SelectAttributeConfig } from "../common/SelectAttributeConfig";
 import { useEffect } from "react";
 
 const attributeTypes = [
