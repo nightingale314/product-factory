@@ -4,6 +4,9 @@ export const routes = {
   products: "/products",
   attributes: "/attributes",
   enrichment: "/enrichment",
+  import: {
+    products: "/import",
+  },
 };
 
 export const apiRoutes = {

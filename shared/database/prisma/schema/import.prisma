@@ -1,0 +1,30 @@
+
+enum ProductImportStep {
+  MAPPING_SELECTION
+  PRODUCT_IMPORT
+  COMPLETED
+}
+
+
+// mappings model
+// {
+//   "id": "1",
+//   "attributeId": "1",
+//   "columnIndex": 0,
+// }
+
+model ProductImportTask {
+  id String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  supplierId Int
+  fileUrl String
+  step ProductImportStep?
+  selectedHeaderRowIndex Int
+  mappings Json
+  totalProductsImported Int
+  aborted Boolean @default(false)
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  @@index([supplierId])
+}
