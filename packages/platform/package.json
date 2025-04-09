@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "pnpm exec prisma generate --schema=../../shared/database/prisma/schema"
   },
   "packageManager": "pnpm@9.15.0",
   "engines": {

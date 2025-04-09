@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "preinstall": "pnpm run prisma:generate",
     "dev:platform": "pnpm --filter @product-factory/platform dev",
     "dev:task-service": "pnpm --filter @product-factory/task-service dev",
     "dev:all": "pnpm run dev:platform & pnpm run dev:task-service",

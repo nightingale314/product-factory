@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth/auth";
 import { routes } from "@/constants/routes";
 import { redirect } from "next/navigation";
 
-export const Home = async () => {
+const Home = async () => {
   const session = await auth();
 
   if (!session?.user) {
