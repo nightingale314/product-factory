@@ -25,25 +25,6 @@ export const ImportFileStep = () => {
           throw new Error("File must have at least 2 rows");
         }
 
-        const [header, firstRow] = rows;
-        if (header[0] !== "ATTRIBUTE_ID") {
-          throw new Error('First column header must be "ATTRIBUTE_ID"');
-        }
-
-        if (header[1] !== "skuId") {
-          throw new Error('Second column header must be "skuId"');
-        }
-
-        if (header[2] !== "name") {
-          throw new Error('Third column header must be "name"');
-        }
-
-        if (firstRow[0] !== "ATTRIBUTE_NAME") {
-          throw new Error(
-            'Second row in first column must be "ATTRIBUTE_NAME"'
-          );
-        }
-
         toast.success("File validated successfully");
         onFileChange(file);
       } catch (error) {

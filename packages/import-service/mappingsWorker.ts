@@ -36,7 +36,7 @@ export const handler = async (event: SQSEvent) => {
             name: true,
           },
         }),
-        await db.productImportTask.findUnique({
+        db.productImportTask.findUnique({
           where: {
             id: message.taskId,
           },
