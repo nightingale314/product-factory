@@ -1,9 +1,17 @@
-import { ProductImportController } from "./ProductImportController";
-import { getActiveImportLoader } from "@/server-loader/product-import/getActiveImportLoader";
+import { Suspense } from "react";
+import { ImportContent } from "./ImportContent";
+import { ImportSkeleton } from "./ImportSkeleton";
+import { PageHeader } from "@/components/composition/page-header";
 
 export const ProductImportIndex = async () => {
-  // get active task if any
-  const { data: activeTask } = await getActiveImportLoader();
-
-  return <ProductImportController activeTask={activeTask} />;
+  return (
+    <div className="flex flex-col grow w-full">
+      <PageHeader title="Product Import" />
+      <div className="flex flex-col p-6 grow">
+        <Suspense fallback={<ImportSkeleton />}>
+          <ImportContent />
+        </Suspense>
+      </div>
+    </div>
+  );
 };

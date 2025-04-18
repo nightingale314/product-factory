@@ -3,12 +3,11 @@
 import { UploadFileButton } from "@/components/composition/upload";
 import { parse } from "csv-parse/sync";
 import { toast } from "sonner";
+import { useProductImportController } from "../hooks/useProductImportController";
 
-interface ImportFileStepProps {
-  onUploadSuccess: (file: File) => void;
-}
+export const ImportFileStep = () => {
+  const { onFileChange } = useProductImportController();
 
-export const ImportFileStep = ({ onUploadSuccess }: ImportFileStepProps) => {
   const verifyFile = async (file: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -46,7 +45,7 @@ export const ImportFileStep = ({ onUploadSuccess }: ImportFileStepProps) => {
         }
 
         toast.success("File validated successfully");
-        onUploadSuccess(file);
+        onFileChange(file);
       } catch (error) {
         const err = error as Error;
         toast.error(err.message);
