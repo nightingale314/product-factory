@@ -4,11 +4,11 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  const password = await hash("password123", 10);
+  const password = await hash("password", 10);
 
   const supplier = await prisma.supplier.create({
     data: {
-      name: "Test Supplier",
+      name: "Toy S Rus",
     },
   });
 
