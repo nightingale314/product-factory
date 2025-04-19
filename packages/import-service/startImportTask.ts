@@ -1,5 +1,6 @@
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import { PrismaClient, ProductImportStep } from "@prisma/client";
+import { ImportProductsAttributeMapping } from "./lib/generateProductsFromMappings";
 
 type CreateImportTaskEvent = {
   taskType: "IMPORT" | "GENERATE_MAPPINGS";
@@ -7,6 +8,7 @@ type CreateImportTaskEvent = {
   fileUrl: string;
   taskId?: string;
   headerIndex?: number;
+  selectedMappings?: ImportProductsAttributeMapping[];
 };
 
 // Initialize Prisma Client outside handler for connection reuse across invocations
@@ -44,6 +46,7 @@ export const handler = async (event: CreateImportTaskEvent) => {
 
     const db = getPrismaClient();
 
+    // Allow regeneration of mappings, maybe user added new attributes.
     if (event.taskId) {
       const task = await db.productImportTask.update({
         where: {
@@ -55,11 +58,13 @@ export const handler = async (event: CreateImportTaskEvent) => {
       });
       taskId = task.id;
     } else {
+      // Create new task for user and generate mappings.
       const task = await db.productImportTask.create({
         data: {
           supplierId: event.supplierId,
           fileUrl: event.fileUrl,
           step: ProductImportStep.MAPPING_GENERATION,
+          selectedHeaderIndex: event.headerIndex,
         },
       });
       taskId = task.id;
@@ -71,6 +76,14 @@ export const handler = async (event: CreateImportTaskEvent) => {
         errorMessage: "Task ID is required for importing products",
       };
     }
+
+    if (!event.selectedMappings) {
+      return {
+        errorCode: 400,
+        errorMessage: "Invalid mappings provided",
+      };
+    }
+
     taskId = event.taskId;
   }
 
@@ -82,6 +95,7 @@ export const handler = async (event: CreateImportTaskEvent) => {
       taskId,
       supplierId: event.supplierId,
       headerIndex: event.headerIndex,
+      selectedMappings: event.selectedMappings,
     }),
   };
 

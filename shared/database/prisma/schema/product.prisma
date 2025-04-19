@@ -5,7 +5,6 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   name String
-  type AttributeType
   skuId String @unique
   supplier Supplier @relation(fields: [supplierId], references: [id])
   attributes ProductAttribute[]
@@ -21,11 +20,9 @@ model ProductAttribute {
   attributeId String 
   product Product @relation(fields: [productId], references: [id])
   attribute Attribute @relation(fields: [attributeId], references: [id])
-  type AttributeType
   value Json
 
   @@index([productId, attributeId])
-  @@index([type])
   @@index([value], type: Gin)
   @@map("product_attribute")
 }

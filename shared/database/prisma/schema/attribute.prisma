@@ -12,14 +12,6 @@ enum AttributeType {
   MEDIA // string[]
 }
 
-model AttributeMeasureConfig {
-  id String @id @default(cuid())
-  unit String[]
-  attribute Attribute @relation(fields: [id], references: [id], onDelete: Cascade)
-
-  @@map("attribute_measure")
-}
-
 
 model Attribute {
   id String @id @default(cuid())
@@ -35,7 +27,7 @@ model Attribute {
   enrichmentEnabled Boolean
 
   selectOptions String[]
-  measureConfig AttributeMeasureConfig?
+  measureUnits String[]
   productAttributes ProductAttribute[]
 
   @@index([supplierId])

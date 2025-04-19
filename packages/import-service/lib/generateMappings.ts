@@ -2,6 +2,7 @@ import { createEmbedding } from "@product-factory/openai-lib";
 import { cosineSimilarity } from "./similarity";
 import { Readable } from "stream";
 import { extractRow } from "./csv/extractRow";
+import { RESERVED_ATTRIBUTE_IDS } from "../enums";
 
 type GenerateMappingsAttribute = {
   name: string;
@@ -16,20 +17,31 @@ type GenerateMappingsParams = {
 
 type GenerateMappingsResult = {
   row: string;
-  idx: number;
+  columnIndex: number;
   matchedAttributeId: string | undefined;
-  matchedAttributeName: string | undefined;
   score: number;
 }[];
 
-const ACCEPTANCE_THRESHOLD = 0.6;
+const ACCEPTANCE_THRESHOLD = 0.4;
+
+const RESERVED_ATTRIBUTES = [
+  {
+    id: RESERVED_ATTRIBUTE_IDS.SKU_ID,
+    name: "SKU ID",
+  },
+  {
+    id: RESERVED_ATTRIBUTE_IDS.PRODUCT_NAME,
+    name: "Product Name",
+  },
+];
 
 export const generateMappings = async ({
   csvStream,
   headerIndex,
-  attributeList,
+  attributeList: supplierAttributeList,
 }: GenerateMappingsParams): Promise<GenerateMappingsResult> => {
   const rows = await extractRow(csvStream, headerIndex);
+  const attributeList = [...RESERVED_ATTRIBUTES, ...supplierAttributeList];
 
   const allTexts = [...rows, ...attributeList.map((attr) => attr.name)];
 
@@ -62,10 +74,9 @@ export const generateMappings = async ({
 
     return {
       row,
-      idx,
       score: bestScore,
+      columnIndex: idx,
       matchedAttributeId: match?.id,
-      matchedAttributeName: match?.name,
     };
   });
 
