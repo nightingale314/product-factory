@@ -63,7 +63,7 @@ importers:
         version: link:../../shared/database
       serverless-offline:
         specifier: ^14.4.0
-        version: 14.4.0(serverless@4.12.0)
+        version: 14.4.0(serverless@4.14.1)
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -98,12 +98,15 @@ importers:
       '@types/aws-lambda':
         specifier: ^8.10.149
         version: 8.10.149
+      serverless:
+        specifier: ^4.14.1
+        version: 4.14.1
       serverless-lift:
         specifier: ^1.31.0
-        version: 1.31.0(serverless@4.12.0)
+        version: 1.31.0(serverless@4.14.1)
       serverless-offline:
         specifier: ^14.4.0
-        version: 14.4.0(serverless@4.12.0)
+        version: 14.4.0(serverless@4.14.1)
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.14.0)(typescript@5.8.3)
@@ -4135,8 +4138,8 @@ packages:
     peerDependencies:
       serverless: ^4.0.0
 
-  serverless@4.12.0:
-    resolution: {integrity: sha512-uBMlkYjmuMf/E/4pi1rvzkibK+ypaWrgzD9+YnzLbDZbWuJngfFK0sPoaLZg2QF25xs/NZUDti4mUF5atGGDXg==}
+  serverless@4.14.1:
+    resolution: {integrity: sha512-y+ykV0WDxLGofMW9twYsToRoxwKifgKZ448WcMv1fLdh0itqH+Q9gay0dgj7WJ4kj+JXXqL9Efcb8dtN3dPwGw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -9043,7 +9046,7 @@ snapshots:
 
   server-only@0.0.1: {}
 
-  serverless-lift@1.31.0(serverless@4.12.0):
+  serverless-lift@1.31.0(serverless@4.14.1):
     dependencies:
       '@aws-cdk/aws-apigatewayv2-alpha': 2.21.1-alpha.0(aws-cdk-lib@2.189.0(constructs@10.2.20))(constructs@10.2.20)
       aws-cdk-lib: 2.189.0(constructs@10.2.20)
@@ -9057,12 +9060,12 @@ snapshots:
       mime-types: 2.1.35
       ora: 5.4.1
       pascal-case: 3.1.2
-      serverless: 4.12.0
+      serverless: 4.14.1
       stripe: 8.222.0
       toml: 3.0.0
       traverse: 0.6.11
 
-  serverless-offline@14.4.0(serverless@4.12.0):
+  serverless-offline@14.4.0(serverless@4.14.1):
     dependencies:
       '@aws-sdk/client-lambda': 3.782.0
       '@hapi/boom': 10.0.1
@@ -9086,7 +9089,7 @@ snapshots:
       node-fetch: 3.3.2
       node-schedule: 2.1.1
       p-memoize: 7.1.1
-      serverless: 4.12.0
+      serverless: 4.14.1
       tree-kill: 1.2.2
       tsx: 4.19.3
       velocityjs: 2.0.6
@@ -9097,7 +9100,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  serverless@4.12.0:
+  serverless@4.14.1:
     dependencies:
       axios: 1.8.4
       axios-proxy-builder: 0.1.2
