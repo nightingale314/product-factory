@@ -1,3 +1,5 @@
+"use client";
+
 import { DateTimeCell } from "@/components/composition/table/cells/datetime";
 import { TextCell } from "@/components/composition/table/cells/text";
 import { Button } from "@/components/ui/button";

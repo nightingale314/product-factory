@@ -3,6 +3,7 @@ import { Readable } from "stream";
 import csv from "csv-parser";
 import { RESERVED_ATTRIBUTE_IDS } from "../enums";
 import { isReservedAttribute, parseAttributeValue } from "./attribute";
+import { JsonValue } from "@prisma/client/runtime/library";
 
 type CsvRow = string[];
 
@@ -29,7 +30,7 @@ type ImportProductsResult = {
     product: Pick<Product, "name" | "skuId">;
     attributes: Array<{
       attributeId: string;
-      value: any;
+      value: JsonValue;
     }>;
   }>;
   rowWithIssues?: Array<ImportProductsRowIssue>;
@@ -101,7 +102,7 @@ export const generateProductsFromMappings = async ({
                 };
               })
               .filter(
-                (attr): attr is { attributeId: string; value: unknown } =>
+                (attr): attr is { attributeId: string; value: JsonValue } =>
                   attr !== null && attr?.value !== null
               );
 

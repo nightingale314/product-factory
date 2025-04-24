@@ -1,5 +1,6 @@
 import { Attribute } from "@prisma/client";
 import { RESERVED_ATTRIBUTE_IDS } from "../enums";
+import { JsonValue } from "@prisma/client/runtime/library";
 
 export const isReservedAttribute = (
   attributeId: string
@@ -12,7 +13,7 @@ export const isReservedAttribute = (
 export const parseAttributeValue = (
   value: string,
   attribute: Attribute
-): unknown => {
+): JsonValue => {
   const { type } = attribute;
 
   try {
@@ -24,10 +25,7 @@ export const parseAttributeValue = (
         return value.toLowerCase() === "true";
       }
       case "DATE": {
-        return new Date(value).toISOString().split("T")[0];
-      }
-      case "DATETIME": {
-        return new Date(value).toISOString();
+        return new Date(value).getTime();
       }
 
       case "SINGLE_SELECT": {

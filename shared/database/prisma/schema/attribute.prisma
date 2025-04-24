@@ -3,8 +3,7 @@ enum AttributeType {
   LONG_TEXT // string
   NUMBER // number
   BOOLEAN // boolean
-  DATE // date
-  DATETIME // date and time
+  DATE // number
   SINGLE_SELECT //  string
   MULTI_SELECT // string[]
   HTML // string
