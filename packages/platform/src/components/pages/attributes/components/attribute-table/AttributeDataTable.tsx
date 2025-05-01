@@ -37,18 +37,20 @@ export function AttributeDataTable({ data, total }: AttributeDataTableProps) {
 
   return (
     <>
-      <EditAttributeModal
-        open={openEditModal}
-        setOpen={setOpenEditModal}
-        initialAttribute={selectedAttribute}
-        onEditSuccess={(attribute) => {
-          setTableData(
-            tableData.map((attr) =>
-              attr.id === attribute.id ? attribute : attr
-            )
-          );
-        }}
-      />
+      {selectedAttribute && (
+        <EditAttributeModal
+          open={openEditModal}
+          setOpen={setOpenEditModal}
+          initialAttribute={selectedAttribute}
+          onEditSuccess={(attribute) => {
+            setTableData(
+              tableData.map((attr) =>
+                attr.id === attribute.id ? attribute : attr
+              )
+            );
+          }}
+        />
+      )}
       <DataTable
         columns={columns}
         data={tableData}

@@ -15,7 +15,7 @@ import { ArrowRight } from "lucide-react";
 import { createImportTask } from "@/server-actions/import/createImportTask";
 
 export const SelectHeadersStep = () => {
-  const { headers, nextStep } = useProductImportController();
+  const { headers } = useProductImportController();
   const [selectedRow, setSelectedRow] = useState<number | null>(0);
 
   // Limit columns to 10

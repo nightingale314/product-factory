@@ -9,7 +9,7 @@ const Home = async () => {
     redirect(routes.login);
   }
 
-  redirect(routes.products);
+  redirect(routes.products.root);
 };
 
 export default Home;
