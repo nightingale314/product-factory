@@ -22,7 +22,6 @@ const attributeTypes = [
   { label: "Number", value: AttributeType.NUMBER },
   { label: "Boolean", value: AttributeType.BOOLEAN },
   { label: "Date", value: AttributeType.DATE },
-  { label: "Datetime", value: AttributeType.DATETIME },
   { label: "Single select", value: AttributeType.SINGLE_SELECT },
   { label: "Multi select", value: AttributeType.MULTI_SELECT },
   { label: "HTML", value: AttributeType.HTML },
@@ -143,6 +142,7 @@ export function EditAttributeFormItems() {
         name="enrichmentEnabled"
         control={control}
         rules={{ required: true }}
+        disabled={attributeType === AttributeType.MEDIA}
         render={({ field }) => (
           <FormField
             name="enrichmentEnabled"
