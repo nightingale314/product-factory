@@ -19,6 +19,24 @@ export const updateAttributeAction = async (
   try {
     const { user } = session;
 
+    // Check for existing attribute with same name (excluding current attribute)
+    const existingAttribute = await prisma.attribute.findFirst({
+      where: {
+        supplierId: user.supplierId,
+        name: attribute.name,
+        type: attribute.type,
+        id: { not: attributeId }, // Exclude current attribute
+      },
+    });
+
+    if (existingAttribute) {
+      return {
+        message: `Attribute "${attribute.name}" of type ${attribute.type} already exists. Please use a different name or type.`,
+        errorCode: ServerErrorCode.ATTRIBUTE_CONFLICT,
+        data: null,
+      };
+    }
+
     const response = await prisma.attribute.update({
       where: {
         id: attributeId,
@@ -26,8 +44,8 @@ export const updateAttributeAction = async (
       },
       data: {
         ...attribute,
-        type: undefined,
-        measureConfig: undefined,
+        type: undefined, // Prevent type updates
+        measureUnits: undefined, // Prevent measure units updates
       },
     });
 

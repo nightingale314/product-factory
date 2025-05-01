@@ -45,21 +45,20 @@ export const SelectAttributeConfig = ({
               onChange={(e) => setValue(e.target.value)}
               value={value}
             />
-            <div className="flex-none items-center">
-              <Button
-                type="button"
-                onClick={handleAddOptions}
-                size="icon"
-                variant="ghost"
-                className="mx-2 grow-0"
-              >
-                <ArrowRight className="size-4" />
-              </Button>
-            </div>
           </div>
         </>
       ) : null}
-
+      <div className="flex-none items-center">
+        <Button
+          type="button"
+          onClick={handleAddOptions}
+          size="icon"
+          variant="ghost"
+          className="mx-2 grow-0"
+        >
+          <ArrowRight className="size-4" />
+        </Button>
+      </div>
       <ScrollArea className="grow basis-0 min-w-0 h-52 rounded-md border">
         {options && options?.length > 0 ? (
           options.map((option, idx) => (

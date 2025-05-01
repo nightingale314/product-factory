@@ -36,6 +36,7 @@ export function CreateAttributeFormItems() {
     control,
     register,
     unregister,
+    setValue,
     formState: { errors, defaultValues },
   } = useFormContext<CreateAttributeSchema>();
 
@@ -47,6 +48,12 @@ export function CreateAttributeFormItems() {
       attributeType !== AttributeType.MULTI_SELECT
     ) {
       unregister("selectOptions");
+    }
+    if (attributeType !== AttributeType.MEASURE) {
+      unregister("measureUnits");
+    }
+    if (attributeType === AttributeType.MEDIA) {
+      setValue("enrichmentEnabled", false);
     }
   }, [attributeType]);
 
@@ -131,11 +138,33 @@ export function CreateAttributeFormItems() {
         />
       )}
 
+      {attributeType === AttributeType.MEASURE && (
+        <Controller
+          name="measureUnits"
+          control={control}
+          render={({ field }) => (
+            <FormField
+              name="measureUnits"
+              errors={errors}
+              label="Attribute Measure Units"
+              className="col-span-2"
+              description="Enter the units for the measure attribute. Each unit should be unique and on a new line."
+            >
+              <SelectAttributeConfig
+                initialOptions={field?.value}
+                onChange={(options) => {
+                  field.onChange(options);
+                }}
+              />
+            </FormField>
+          )}
+        />
+      )}
+
       <Controller
         name="required"
         control={control}
         rules={{ required: true }}
-        disabled={attributeType === AttributeType.MEDIA}
         render={({ field }) => (
           <FormField
             name="required"
@@ -157,6 +186,7 @@ export function CreateAttributeFormItems() {
         name="enrichmentEnabled"
         control={control}
         rules={{ required: true }}
+        disabled={attributeType === AttributeType.MEDIA}
         render={({ field }) => (
           <FormField
             name="enrichmentEnabled"

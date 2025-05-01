@@ -1,12 +1,6 @@
 import { AttributeType } from "@prisma/client";
 import { z } from "zod";
 
-export const measureAttributeConfigSchema = z
-  .object({
-    unit: z.array(z.string().min(1)),
-  })
-  .optional();
-
 export const createAttributeSchema = z
   .object({
     name: z.string().min(1),
@@ -17,11 +11,18 @@ export const createAttributeSchema = z
     enrichmentInstructions: z.string().optional(),
     selectOptions: z
       .array(z.string())
+      .min(1)
       .refine((val) => new Set(val).size === val.length, {
         message: "Options must be unique",
       })
       .optional(),
-    measureConfig: measureAttributeConfigSchema,
+    measureUnits: z
+      .array(z.string())
+      .min(1)
+      .refine((val) => new Set(val).size === val.length, {
+        message: "Options must be unique",
+      })
+      .optional(),
   })
   .refine(
     (data) => {
@@ -42,6 +43,3 @@ export const createAttributeSchema = z
   );
 
 export type CreateAttributeSchema = z.infer<typeof createAttributeSchema>;
-export type MeasureAttributeConfigSchema = z.infer<
-  typeof measureAttributeConfigSchema
->;

@@ -47,11 +47,7 @@ export function EditAttributeFormItems() {
         required
         description="Name of the attribute."
       >
-        <Input
-          {...register("name")}
-          defaultValue={defaultValues?.name}
-          disabled
-        />
+        <Input {...register("name")} defaultValue={defaultValues?.name} />
       </FormField>
 
       <Controller
@@ -115,6 +111,29 @@ export function EditAttributeFormItems() {
             }
           />
         </FormField>
+      )}
+
+      {attributeType === AttributeType.MEASURE && (
+        <Controller
+          name="measureUnits"
+          control={control}
+          render={({ field }) => (
+            <FormField
+              name="measureUnits"
+              errors={errors}
+              label="Attribute Measure Units"
+              className="col-span-2"
+              description="Enter the units for the measure attribute. Each unit should be unique and on a new line."
+            >
+              <SelectAttributeConfig
+                initialOptions={field?.value}
+                onChange={(options) => {
+                  field.onChange(options);
+                }}
+              />
+            </FormField>
+          )}
+        />
       )}
 
       <Controller
