@@ -7,7 +7,7 @@ import { ProductDataTable } from "./product-table/ProductDataTable";
 export const ProductPageHeader = () => {
   return (
     <div>
-      <PageHeader title="Attributes">
+      <PageHeader title="Products">
         <Link href={routes.import.products}>
           <Button>Import products</Button>
         </Link>

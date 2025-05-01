@@ -1,5 +1,9 @@
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
-import { PrismaClient, ProductImportStep } from "@prisma/client";
+import {
+  PrismaClient,
+  ProductImportStep,
+  ProductImportTask,
+} from "@prisma/client";
 import { ImportProductsAttributeMapping } from "./lib/generateProductsFromMappings";
 
 type CreateImportTaskEvent = {
@@ -11,7 +15,6 @@ type CreateImportTaskEvent = {
   selectedMappings?: ImportProductsAttributeMapping[];
 };
 
-// Initialize Prisma Client outside handler for connection reuse across invocations
 let prisma: PrismaClient;
 const getPrismaClient = () => {
   if (!prisma) {
@@ -21,12 +24,12 @@ const getPrismaClient = () => {
 };
 
 export const handler = async (event: CreateImportTaskEvent) => {
-  const queueUrl =
-    event.taskType === "GENERATE_MAPPINGS"
-      ? process.env.MAPPINGS_GENERATOR_QUEUE_URL
-      : process.env.IMPORTER_QUEUE_URL;
-
-  let taskId: string | undefined;
+  if (event.taskType !== "IMPORT" && event.taskType !== "GENERATE_MAPPINGS") {
+    return {
+      errorCode: 400,
+      errorMessage: "Invalid task type",
+    };
+  }
 
   if (!event.supplierId) {
     return {
@@ -35,75 +38,87 @@ export const handler = async (event: CreateImportTaskEvent) => {
     };
   }
 
-  if (event.taskType === "GENERATE_MAPPINGS") {
-    if (!event.headerIndex || !event.fileUrl) {
-      return {
-        errorCode: 400,
-        errorMessage:
-          "Inalid arguments, check that header index and file URL are provided",
-      };
-    }
+  const queueUrl =
+    event.taskType === "GENERATE_MAPPINGS"
+      ? process.env.MAPPINGS_GENERATOR_QUEUE_URL
+      : process.env.IMPORTER_QUEUE_URL;
 
-    const db = getPrismaClient();
+  let task: ProductImportTask | undefined;
+  let taskId: string | undefined;
 
-    // Allow regeneration of mappings, maybe user added new attributes.
-    if (event.taskId) {
-      const task = await db.productImportTask.update({
-        where: {
-          id: event.taskId,
-        },
-        data: {
-          step: ProductImportStep.MAPPING_GENERATION,
-        },
-      });
-      taskId = task.id;
+  try {
+    if (event.taskType === "GENERATE_MAPPINGS") {
+      if (!event.headerIndex || !event.fileUrl) {
+        throw new Error(
+          "Inalid arguments, check that header index and file URL are provided"
+        );
+      }
+
+      const db = getPrismaClient();
+
+      // Allow regeneration of mappings, maybe user added new attributes.
+      if (event.taskId) {
+        task = await db.productImportTask.update({
+          where: {
+            id: event.taskId,
+          },
+          data: {
+            step: ProductImportStep.MAPPING_GENERATION,
+          },
+        });
+        taskId = task.id;
+      } else {
+        // Create new task for user and generate mappings.
+        task = await db.productImportTask.create({
+          data: {
+            supplierId: event.supplierId,
+            fileUrl: event.fileUrl,
+            step: ProductImportStep.MAPPING_GENERATION,
+            selectedHeaderIndex: event.headerIndex,
+          },
+        });
+        taskId = task.id;
+      }
     } else {
-      // Create new task for user and generate mappings.
-      const task = await db.productImportTask.create({
-        data: {
-          supplierId: event.supplierId,
-          fileUrl: event.fileUrl,
-          step: ProductImportStep.MAPPING_GENERATION,
-          selectedHeaderIndex: event.headerIndex,
-        },
-      });
-      taskId = task.id;
-    }
-  } else {
-    if (!event.taskId) {
-      return {
-        errorCode: 400,
-        errorMessage: "Task ID is required for importing products",
-      };
+      if (!event.taskId) {
+        throw new Error("Task ID is required for importing products");
+      }
+
+      if (!event.selectedMappings) {
+        throw new Error("Invalid mappings provided");
+      }
+
+      taskId = event.taskId;
     }
 
-    if (!event.selectedMappings) {
-      return {
-        errorCode: 400,
-        errorMessage: "Invalid mappings provided",
-      };
-    }
+    const client = new SQSClient();
 
-    taskId = event.taskId;
+    const input = {
+      QueueUrl: queueUrl,
+      MessageBody: JSON.stringify({
+        taskId,
+        supplierId: event.supplierId,
+        headerIndex: event.headerIndex,
+        selectedMappings: event.selectedMappings,
+      }),
+    };
+
+    const command = new SendMessageCommand(input);
+    await client.send(command);
+
+    return {
+      data: {
+        task,
+      },
+      error: null,
+    };
+  } catch (err) {
+    const error = err as Error;
+    return {
+      errorCode: 400,
+      errorMessage: error?.message,
+    };
+  } finally {
+    prisma?.$disconnect();
   }
-
-  const client = new SQSClient();
-
-  const input = {
-    QueueUrl: queueUrl,
-    MessageBody: JSON.stringify({
-      taskId,
-      supplierId: event.supplierId,
-      headerIndex: event.headerIndex,
-      selectedMappings: event.selectedMappings,
-    }),
-  };
-
-  const command = new SendMessageCommand(input);
-  await client.send(command);
-
-  return {
-    data: {},
-    error: null,
-  };
 };

@@ -1,8 +1,6 @@
 import { ProductImportIndex } from "@/components/pages/import";
-import { routes } from "@/constants/routes";
-import { auth } from "@/lib/auth/auth";
+import { getAuthSession } from "@/lib/auth/getAuthSession";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Product Import | Product Factory",
@@ -10,11 +8,7 @@ export const metadata: Metadata = {
 };
 
 const ProductImportPage = async () => {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect(routes.login);
-  }
+  await getAuthSession();
 
   return <ProductImportIndex />;
 };

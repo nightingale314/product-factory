@@ -8,6 +8,7 @@ service: import-service
 plugins:
   - serverless-offline
   - serverless-lift
+  - serverless-dotenv-plugin
 
 provider:
   name: aws
@@ -28,15 +29,35 @@ provider:
             - "lambda:InvokeFunction"
           Resource: "*"
 
+package:
+  patterns:
+    - "*.ts"
+    - "*.js"
+    # Include Prisma files from shared workspace
+    - "../../shared/database/node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/**/*"
+    - "../../shared/database/node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client/**/*"
+    # Include only the Linux engine for Lambda
+    - "!../../shared/database/node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/engines/**"
+    - "!../../shared/database/node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-*"
+    - "../../shared/database/node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-linux-*"
+    # Exclude unnecessary files
+    - "!../../shared/database/prisma/migrations/**"
+    # Include local node_modules
+    - "node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/**/*"
+    - "node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client/**/*"
+    - "!node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/engines/**"
+    - "!node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-*"
+    - "node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-linux-*"
+
 functions:
   startImportTask:
     handler: startImportTask.handler
     environment:
-      MAPPINGS_GENERATOR_QUEUE_URL: ${construct:product-import-service-mappings-generator-queue.queueUrl}
-      IMPORTER_QUEUE_URL: ${construct:product-import-service-importer-queue.queueUrl}
+      MAPPINGS_GENERATOR_QUEUE_URL: ${construct:mappings-generator-queue.queueUrl}
+      IMPORTER_QUEUE_URL: ${construct:product-importer-queue.queueUrl}
 
 constructs:
-  product-import-service-mappings-generator-queue:
+  mappings-generator-queue:
     type: queue
     batchSize: 1
     maxRetries: 1
@@ -44,7 +65,7 @@ constructs:
     worker:
       handler: mappingsWorker.handler
       environment:
-  product-import-service-importer-queue:
+  product-importer-queue:
     type: queue
     batchSize: 1
     maxRetries: 1

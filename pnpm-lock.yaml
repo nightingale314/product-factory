@@ -101,6 +101,9 @@ importers:
       serverless:
         specifier: ^4.14.1
         version: 4.14.1
+      serverless-dotenv-plugin:
+        specifier: ^6.0.0
+        version: 6.0.0(serverless@4.14.1)
       serverless-lift:
         specifier: ^1.31.0
         version: 1.31.0(serverless@4.14.1)
@@ -140,6 +143,9 @@ importers:
       '@product-factory/database':
         specifier: workspace:^
         version: link:../../shared/database
+      '@product-factory/import-service':
+        specifier: workspace:^
+        version: link:../import-service
       '@radix-ui/react-avatar':
         specifier: ^1.1.3
         version: 1.1.3(@types/react-dom@19.1.1(@types/react@19.1.0))(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -2712,6 +2718,10 @@ packages:
   dot-case@3.0.4:
     resolution: {integrity: sha512-Kv5nKlh6yRrdrGvxeJ2e5y2eRUpkUosIW4A2AS38zwSz27zu7ufDwQPi5Jhs3XAlGNetl3bmnGhQsMtkKJnj3w==}
 
+  dotenv-expand@10.0.0:
+    resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
+    engines: {node: '>=12'}
+
   dotenv@16.4.7:
     resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
@@ -4125,6 +4135,11 @@ packages:
 
   server-only@0.0.1:
     resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
+
+  serverless-dotenv-plugin@6.0.0:
+    resolution: {integrity: sha512-8tLVNwHfDO0sBz6+m+DLTZquRk0AZq9rzqk3kphm1iIWKfan9R7RKt4hdq3eQ0kmDoqzudjPYBEXAJ5bUNKeGQ==}
+    peerDependencies:
+      serverless: 1 || 2 || pre-3 || 3
 
   serverless-lift@1.31.0:
     resolution: {integrity: sha512-dl2WymoMcEOYT6OI5cLwgeYN54jMLUH5mj8Wioe7AAXqFRNIpFJBQ9BVVBdB+YEKTO32Eu5vcAJBC6mqyPq3lA==}
@@ -7491,6 +7506,8 @@ snapshots:
       no-case: 3.0.4
       tslib: 2.8.1
 
+  dotenv-expand@10.0.0: {}
+
   dotenv@16.4.7: {}
 
   dunder-proto@1.0.1:
@@ -9045,6 +9062,13 @@ snapshots:
       upper-case-first: 2.0.2
 
   server-only@0.0.1: {}
+
+  serverless-dotenv-plugin@6.0.0(serverless@4.14.1):
+    dependencies:
+      chalk: 4.1.2
+      dotenv: 16.4.7
+      dotenv-expand: 10.0.0
+      serverless: 4.14.1
 
   serverless-lift@1.31.0(serverless@4.14.1):
     dependencies:

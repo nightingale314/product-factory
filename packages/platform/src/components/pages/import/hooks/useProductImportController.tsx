@@ -23,6 +23,8 @@ interface ProductImportContextType {
   nextStep: () => void;
   previousStep: () => void;
   onFileChange: (file: File) => void;
+  setTask: (task: ProductImportTask) => void;
+  file?: File | null;
 }
 
 const ProductImportContext = createContext<ProductImportContextType | null>(
@@ -40,9 +42,7 @@ export const ProductImportProvider = ({
   activeTask,
   initialStep,
 }: ProductImportProviderProps) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [task, setTask] = useState<ProductImportTask | null>(activeTask);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [file, setFile] = useState<File | null>();
   const [headers, setHeaders] = useState<ImportHeaders[] | null>(null);
   const [step, setStep] = useState<ImportStep>(initialStep);
@@ -112,8 +112,10 @@ export const ProductImportProvider = ({
       nextStep,
       previousStep,
       reset,
+      file,
+      setTask,
     }),
-    [task, headers, step, onFileChange, nextStep, previousStep]
+    [task, headers, step, onFileChange, nextStep, previousStep, file, setTask]
   );
 
   return (

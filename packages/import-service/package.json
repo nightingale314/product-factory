@@ -10,6 +10,7 @@
     "@product-factory/openai-lib": "workspace:^",
     "@types/aws-lambda": "^8.10.149",
     "serverless": "^4.14.1",
+    "serverless-dotenv-plugin": "^6.0.0",
     "serverless-lift": "^1.31.0",
     "serverless-offline": "^14.4.0",
     "ts-node": "^10.9.2",

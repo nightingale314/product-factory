@@ -23,8 +23,8 @@ export const handler = async (event: SQSEvent) => {
   const db = getPrismaClient();
   const failedMessageIds: string[] = [];
 
-  try {
-    for (const record of event.Records) {
+  for (const record of event.Records) {
+    try {
       const message = JSON.parse(record.body) as QueueMessage;
 
       const task = await db.productImportTask.findUnique({
@@ -75,7 +75,7 @@ export const handler = async (event: SQSEvent) => {
           supplierId,
         }));
 
-      const createdProducts = await prisma.product.createManyAndReturn({
+      const createdProducts = await db.product.createManyAndReturn({
         select: {
           id: true,
           skuId: true,
@@ -100,11 +100,11 @@ export const handler = async (event: SQSEvent) => {
         })
       );
 
-      await prisma.productAttribute.createMany({
+      await db.productAttribute.createMany({
         data: productAttributesToCreate,
       });
 
-      await prisma.productImportTask.update({
+      await db.productImportTask.update({
         where: {
           supplierId,
           id: task.id,
@@ -116,20 +116,18 @@ export const handler = async (event: SQSEvent) => {
         },
       });
 
-      console.log("Processed message:", message);
+      console.log(`Product imported for task ${taskId}`);
+    } catch (error) {
+      console.error(`Error processing message ${record.messageId}:`, error);
+      failedMessageIds.push(record.messageId);
     }
 
-    return {
-      batchItemFailures: failedMessageIds.map((id) => ({
-        itemIdentifier: id,
-      })),
-    };
-  } catch (error) {
-    console.error("Error processing messages:", error);
-    return {
-      batchItemFailures: event.Records.map((record) => ({
-        itemIdentifier: record.messageId,
-      })),
-    };
+    return failedMessageIds.length > 0
+      ? {
+          batchItemFailures: failedMessageIds.map((id) => ({
+            itemIdentifier: id,
+          })),
+        }
+      : null;
   }
 };

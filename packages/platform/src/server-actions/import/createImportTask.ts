@@ -3,11 +3,11 @@
 import { getAuthSession } from "@/lib/auth/getAuthSession";
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 import { fromEnv } from "@aws-sdk/credential-providers";
+import { CreateImportTaskInput, CreateImportTaskOutput } from "@/types/product";
 
 export const createImportTask = async (
-  fileUrl: string,
-  headerIndex: number
-) => {
+  input: CreateImportTaskInput
+): Promise<CreateImportTaskOutput> => {
   const session = await getAuthSession();
 
   try {
@@ -20,18 +20,16 @@ export const createImportTask = async (
       ? `${process.env.IMPORT_SERVICE_NAME}-startImportTask`
       : "";
 
-    console.log("Invoking function:", functionName);
-
     const command = new InvokeCommand({
       FunctionName: functionName,
-      Payload: Buffer.from(
-        JSON.stringify({
-          taskType: "GENERATE_MAPPINGS",
-          supplierId: session.user.supplierId,
-          fileUrl,
-          headerIndex,
-        })
-      ),
+      Payload: JSON.stringify({
+        supplierId: session.user.supplierId,
+        taskType: input.taskType,
+        fileUrl: input.fileUrl,
+        headerIndex: input.headerIndex,
+        taskId: input.taskId,
+        selectedMappings: input.selectedMappings,
+      }),
     });
 
     const response = await client.send(command);

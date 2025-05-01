@@ -1,9 +1,7 @@
 import { AttributesIndex } from "@/components/pages/attributes";
-import { routes } from "@/constants/routes";
-import { auth } from "@/lib/auth/auth";
+import { getAuthSession } from "@/lib/auth/getAuthSession";
 import { PageProps } from "@/types/common";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Attributes | Product Factory",
@@ -11,11 +9,7 @@ export const metadata: Metadata = {
 };
 
 const AttributesPage = async ({ searchParams }: PageProps) => {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect(routes.login);
-  }
+  await getAuthSession();
 
   return <AttributesIndex searchParams={searchParams} />;
 };

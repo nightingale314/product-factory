@@ -1,6 +1,6 @@
-import { Attribute } from "@prisma/client";
+import { Attribute, Prisma } from "@prisma/client";
 import { RESERVED_ATTRIBUTE_IDS } from "../enums";
-import { JsonValue } from "@prisma/client/runtime/library";
+import { InputJsonValue } from "@prisma/client/runtime/library";
 
 export const isReservedAttribute = (
   attributeId: string
@@ -13,7 +13,7 @@ export const isReservedAttribute = (
 export const parseAttributeValue = (
   value: string,
   attribute: Attribute
-): JsonValue => {
+): InputJsonValue | typeof Prisma.JsonNull => {
   const { type } = attribute;
 
   try {

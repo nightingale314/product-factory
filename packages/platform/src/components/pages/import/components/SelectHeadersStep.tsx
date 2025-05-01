@@ -13,9 +13,12 @@ import { useProductImportController } from "../hooks/useProductImportController"
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { createImportTask } from "@/server-actions/import/createImportTask";
+import { UploadTarget } from "@/constants/upload";
+import { uploadFile } from "@/lib/upload";
+import { toast } from "sonner";
 
 export const SelectHeadersStep = () => {
-  const { headers } = useProductImportController();
+  const { headers, file, nextStep, setTask } = useProductImportController();
   const [selectedRow, setSelectedRow] = useState<number | null>(0);
 
   // Limit columns to 10
@@ -23,9 +26,32 @@ export const SelectHeadersStep = () => {
     columns: header.columns.slice(0, 10),
   }));
 
-  const testClick = async () => {
-    if (selectedRow === null) return;
-    await createImportTask("https://www.google.com", selectedRow);
+  const next = async () => {
+    if (selectedRow === null || !file) return;
+
+    try {
+      const uploadedFileData = await uploadFile(
+        file,
+        UploadTarget.PRODUCT_IMPORT
+      );
+
+      const task = await createImportTask({
+        fileUrl: uploadedFileData.url,
+        headerIndex: selectedRow,
+        taskType: "IMPORT",
+      });
+
+      if (task.errorCode || !task.data) {
+        throw new Error(task.message);
+      }
+
+      setTask(task.data);
+      nextStep();
+    } catch (error) {
+      toast.error(
+        `Error in registering your selected headers. Please reload the page and restart the import process. Error: ${error}`
+      );
+    }
   };
 
   return (
@@ -87,7 +113,7 @@ export const SelectHeadersStep = () => {
         </Table>
       </div>
       <div className="flex justify-end">
-        <Button disabled={selectedRow === null} onClick={testClick}>
+        <Button disabled={selectedRow === null} onClick={next}>
           <ArrowRight /> Next
         </Button>
       </div>

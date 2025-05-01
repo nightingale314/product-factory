@@ -88,6 +88,8 @@ export const handler = async (event: SQSEvent) => {
     }
   }
 
+  prisma?.$disconnect();
+
   return failedMessageIds.length > 0
     ? {
         batchItemFailures: failedMessageIds.map((id) => ({
