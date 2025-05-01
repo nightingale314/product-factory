@@ -7,9 +7,7 @@
     "dev:platform": "pnpm --filter @product-factory/platform dev",
     "dev:task-service": "pnpm --filter @product-factory/task-service dev",
     "dev:all": "pnpm run dev:platform & pnpm run dev:task-service",
-    "lint:platform": "pnpm --filter @product-factory/platform lint",
-    "prisma:generate": "prisma generate --schema=./shared/database/prisma/schema",
-    "prisma:migrate": "prisma migrate dev --schema=./shared/database/prisma/schema"
+    "lint:platform": "pnpm --filter @product-factory/platform lint"
   },
   "packageManager": "pnpm@9.15.0",
   "engines": {

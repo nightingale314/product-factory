@@ -5,6 +5,10 @@
   "engines": {
     "node": ">=20"
   },
+  "scripts": {
+    "prisma:generate": "prisma generate --schema=./prisma/schema",
+    "prisma:migrate": "prisma migrate dev --schema=./prisma/schema"
+  },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
