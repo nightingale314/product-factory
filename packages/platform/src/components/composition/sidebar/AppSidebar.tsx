@@ -20,7 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const items = [
   {
     title: "Products",
-    url: routes.products,
+    url: routes.products.root,
     icon: Store,
   },
   {
