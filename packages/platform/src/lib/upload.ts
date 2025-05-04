@@ -18,7 +18,7 @@ export const uploadFile = async (
   const uploadedFileData = await uploadedFile.json();
 
   if (uploadedFileData.errorCode !== ServerErrorCode.SUCCESS) {
-    throw new Error("Failed to upload file");
+    throw new Error("Failed to upload file. Please try again later.");
   }
 
   return uploadedFileData.data as UploadFileResponse;

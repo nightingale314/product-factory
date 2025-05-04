@@ -9,7 +9,7 @@ import { ImportProductsAttributeMapping } from "./lib/generateProductsFromMappin
 type CreateImportTaskEvent = {
   taskType: "IMPORT" | "GENERATE_MAPPINGS";
   supplierId: number;
-  fileUrl: string;
+  fileKey: string;
   taskId?: string;
   headerIndex?: number;
   selectedMappings?: ImportProductsAttributeMapping[];
@@ -27,14 +27,14 @@ export const handler = async (event: CreateImportTaskEvent) => {
   if (event.taskType !== "IMPORT" && event.taskType !== "GENERATE_MAPPINGS") {
     return {
       errorCode: 400,
-      errorMessage: "Invalid task type",
+      message: "Invalid task type",
     };
   }
 
   if (!event.supplierId) {
     return {
       errorCode: 400,
-      errorMessage: "Invalid Supplier ID",
+      message: "Invalid Supplier ID",
     };
   }
 
@@ -48,7 +48,7 @@ export const handler = async (event: CreateImportTaskEvent) => {
 
   try {
     if (event.taskType === "GENERATE_MAPPINGS") {
-      if (!event.headerIndex || !event.fileUrl) {
+      if (event.headerIndex === undefined || event.fileKey === undefined) {
         throw new Error(
           "Inalid arguments, check that header index and file URL are provided"
         );
@@ -72,7 +72,7 @@ export const handler = async (event: CreateImportTaskEvent) => {
         task = await db.productImportTask.create({
           data: {
             supplierId: event.supplierId,
-            fileUrl: event.fileUrl,
+            fileKey: event.fileKey,
             step: ProductImportStep.MAPPING_GENERATION,
             selectedHeaderIndex: event.headerIndex,
           },
@@ -106,17 +106,23 @@ export const handler = async (event: CreateImportTaskEvent) => {
     const command = new SendMessageCommand(input);
     await client.send(command);
 
+    console.log("Task started:", {
+      task,
+      supplierId: event.supplierId,
+    });
+
     return {
       data: {
-        task,
+        ...task,
       },
-      error: null,
+      errorCode: 0,
     };
   } catch (err) {
     const error = err as Error;
+    console.error("Error starting import task:", error?.message);
     return {
       errorCode: 400,
-      errorMessage: error?.message,
+      message: error?.message,
     };
   } finally {
     prisma?.$disconnect();

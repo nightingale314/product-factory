@@ -79,6 +79,9 @@ importers:
       '@aws-sdk/client-sqs':
         specifier: ^3.782.0
         version: 3.782.0
+      '@prisma/client':
+        specifier: ^6.5.0
+        version: 6.5.0(prisma@6.5.0(typescript@5.8.3))(typescript@5.8.3)
       aws-lambda:
         specifier: ^1.0.7
         version: 1.0.7
@@ -98,6 +101,9 @@ importers:
       '@types/aws-lambda':
         specifier: ^8.10.149
         version: 8.10.149
+      prisma:
+        specifier: ^6.5.0
+        version: 6.5.0(typescript@5.8.3)
       serverless:
         specifier: ^4.14.1
         version: 4.14.1

@@ -1,7 +1,7 @@
 import { UploadTarget } from "@/constants/upload";
 
 export type UploadFileResponse = {
-  url: string;
+  fileKey: string;
   fileName: string;
   size: number;
   type: string;

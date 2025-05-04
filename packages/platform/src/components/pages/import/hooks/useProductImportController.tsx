@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { ImportStep } from "../constants";
+import { toast } from "sonner";
 
 export interface ImportHeaders {
   columns: string[];
@@ -55,25 +56,29 @@ export const ProductImportProvider = ({
         const rows = parse(content, {
           columns: false,
           skip_empty_lines: true,
-          from_line: 1,
-          to_line: 6,
           trim: true,
           skipRecordsWithError: true,
           relax_column_count: true,
           skip_records_with_empty_values: true,
         });
 
-        const formattedRows = rows.map((row: string[]) => ({
+        if (rows.length < 1) {
+          throw new Error("File must have at least 1 row");
+        }
+        const formattedRows = rows.slice(0, 6).map((row: string[]) => ({
           columns: row.map((cell) =>
             cell.length > 20 ? cell.substring(0, 20) + "..." : cell
           ),
         }));
+
+        console.log({ formattedRows });
 
         setHeaders(formattedRows);
         setStep(ImportStep.SELECT_HEADERS);
       } catch (error) {
         const err = error as Error;
         console.error("Error parsing CSV:", err.message);
+        toast.error(err.message);
       }
     };
     reader.readAsText(csvFile!);

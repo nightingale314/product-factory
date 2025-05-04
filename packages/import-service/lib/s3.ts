@@ -1,30 +1,30 @@
 import {
   GetObjectCommand,
   GetObjectCommandInput,
-  HeadObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
 
-export async function downloadFileFromS3(
-  s3Url: string
-): Promise<Readable | null> {
-  const s3Client = new S3Client({ region: process.env.AWS_REGION });
+const s3Client = new S3Client({
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: process.env.ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY as string,
+  },
+});
 
+export async function downloadFileFromS3({
+  bucket,
+  fileKey,
+}: {
+  bucket: string;
+  fileKey: string;
+}): Promise<Readable | null> {
   try {
-    // Extract bucket and key from S3 URL
-    const url = new URL(s3Url);
-    const bucket = url.hostname.split(".")[0];
-    const key = url.pathname.slice(1);
-
     const params: GetObjectCommandInput = {
-      Key: key,
+      Key: fileKey,
       Bucket: bucket,
     };
-
-    // Check if the file exists
-    const headObjCommand = new HeadObjectCommand(params);
-    await s3Client.send(headObjCommand);
 
     // Get S3 object
     const command = new GetObjectCommand(params);
@@ -34,7 +34,11 @@ export async function downloadFileFromS3(
       throw new Error("Empty response from S3");
     }
 
-    const stream = Body.transformToWebStream() as unknown as Readable;
+    if (Body instanceof Readable) {
+      return Body;
+    }
+
+    const stream = Body as unknown as Readable;
 
     return stream;
   } catch (err) {

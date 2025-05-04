@@ -27,6 +27,8 @@ export const handler = async (event: SQSEvent) => {
     try {
       const message = JSON.parse(record.body) as QueueMessage;
 
+      console.log("Processing:", message);
+
       const task = await db.productImportTask.findUnique({
         where: {
           id: message.taskId,
@@ -39,7 +41,7 @@ export const handler = async (event: SQSEvent) => {
         continue;
       }
 
-      const { step, fileUrl, supplierId, id: taskId } = task;
+      const { step, fileKey, supplierId, id: taskId } = task;
 
       if (step !== ProductImportStep.MAPPING_SELECTION) {
         console.error(`Invalid task ID provided: ${taskId}`);
@@ -48,7 +50,10 @@ export const handler = async (event: SQSEvent) => {
         continue;
       }
 
-      const stream = await downloadFileFromS3(fileUrl);
+      const stream = await downloadFileFromS3({
+        bucket: process.env.PRODUCT_IMPORT_BUCKET_NAME as string,
+        fileKey,
+      });
 
       if (!stream) {
         console.error(`Failed to download file for task ${taskId}`);

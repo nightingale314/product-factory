@@ -27,29 +27,22 @@ provider:
             - "sqs:DeleteMessage"
             - "sqs:GetQueueAttributes"
             - "lambda:InvokeFunction"
-          Resource: "*"
+          Resource:
+            - "arn:aws:s3:::ai-product-hub-product-import/*"
 
 package:
+  individually: true
   patterns:
-    - "*.ts"
-    - "*.js"
-    # Include Prisma files from shared workspace
-    - "../../shared/database/node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/**/*"
-    - "../../shared/database/node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client/**/*"
-    # Include only the Linux engine for Lambda
-    - "!../../shared/database/node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/engines/**"
-    - "!../../shared/database/node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-*"
-    - "../../shared/database/node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-linux-*"
-    # Exclude unnecessary files
-    - "!../../shared/database/prisma/migrations/**"
-    # Include local node_modules
-    - "node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/**/*"
-    - "node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client/**/*"
-    - "!node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/engines/**"
-    - "!node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-*"
-    - "node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-linux-*"
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/**/*"
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client/**/*"
+    # - "!../../node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/engines/**"
+    # - "!../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-*"
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-linux-*"
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-rhel-*"
 
 functions:
+  testHandler:
+    handler: testHandler.handler
   startImportTask:
     handler: startImportTask.handler
     environment:

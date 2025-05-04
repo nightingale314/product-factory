@@ -16,10 +16,12 @@ import { createImportTask } from "@/server-actions/import/createImportTask";
 import { UploadTarget } from "@/constants/upload";
 import { uploadFile } from "@/lib/upload";
 import { toast } from "sonner";
+import { RESERVED_ATTRIBUTE_IDS } from "@product-factory/import-service/enums";
 
 export const SelectHeadersStep = () => {
   const { headers, file, nextStep, setTask } = useProductImportController();
   const [selectedRow, setSelectedRow] = useState<number | null>(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Limit columns to 10
   const limitedHeaders = headers?.map((header) => ({
@@ -28,18 +30,33 @@ export const SelectHeadersStep = () => {
 
   const next = async () => {
     if (selectedRow === null || !file) return;
-
+    setIsLoading(true);
     try {
+      const selectedHeaderRow = headers?.[selectedRow];
+      const isValidHeaderRow = selectedHeaderRow?.columns.some((column) =>
+        Object.values(RESERVED_ATTRIBUTE_IDS).includes(
+          column as RESERVED_ATTRIBUTE_IDS
+        )
+      );
+
+      if (!isValidHeaderRow) {
+        throw new Error(
+          "Invalid header row. Ensure your selected header row contains the reserved column name of 'productName' and 'skuId'."
+        );
+      }
+
       const uploadedFileData = await uploadFile(
         file,
         UploadTarget.PRODUCT_IMPORT
       );
 
       const task = await createImportTask({
-        fileUrl: uploadedFileData.url,
+        fileKey: uploadedFileData.fileKey,
         headerIndex: selectedRow,
-        taskType: "IMPORT",
+        taskType: "GENERATE_MAPPINGS",
       });
+
+      console.log("task", task);
 
       if (task.errorCode || !task.data) {
         throw new Error(task.message);
@@ -47,10 +64,13 @@ export const SelectHeadersStep = () => {
 
       setTask(task.data);
       nextStep();
-    } catch (error) {
+    } catch (err) {
+      const error = err as Error;
       toast.error(
-        `Error in registering your selected headers. Please reload the page and restart the import process. Error: ${error}`
+        `Error in registering your selected headers. \n\n${error?.message}`
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -59,10 +79,16 @@ export const SelectHeadersStep = () => {
       <div className="flex items-center justify-between">
         <div>
           <h4 className="">Select the header row of your CSV file</h4>
-          <p className="text-sm text-muted-foreground">
-            The header row is the row that contains the reserved value of
-            ATTRIBUTE_ID.
-          </p>
+          <ul className="list-disc list-outside ml-4">
+            <li className="text-sm text-muted-foreground">
+              The header row is the row that contains the value that identifies
+              your attribute.
+            </li>
+            <li className="text-sm text-muted-foreground">
+              Ensure that the selected header row contains the reserved column
+              name of &apos;productName&apos; and &apos;skuId&apos;.
+            </li>
+          </ul>
         </div>
       </div>
       <div className="w-full overflow-x-auto">
@@ -87,20 +113,22 @@ export const SelectHeadersStep = () => {
             {limitedHeaders?.map((header, rowIndex) => (
               <TableRow
                 key={rowIndex}
-                className={`border-b hover:bg-gray-50 ${
+                className={`h-full border-b hover:bg-gray-50 ${
                   selectedRow === rowIndex
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
                     : ""
                 }`}
               >
-                <TableCell className="p-2 flex justify-center items-center">
-                  <input
-                    type="radio"
-                    name="headerRow"
-                    checked={selectedRow === rowIndex}
-                    onChange={() => setSelectedRow(rowIndex)}
-                    className="h-4 w-4"
-                  />
+                <TableCell className="p-2 h-full">
+                  <div className="flex justify-center items-center">
+                    <input
+                      type="radio"
+                      name="headerRow"
+                      checked={selectedRow === rowIndex}
+                      onChange={() => setSelectedRow(rowIndex)}
+                      className="h-4 w-4"
+                    />
+                  </div>
                 </TableCell>
                 {header.columns.map((column, colIndex) => (
                   <TableCell key={colIndex} className="p-2">
@@ -113,7 +141,11 @@ export const SelectHeadersStep = () => {
         </Table>
       </div>
       <div className="flex justify-end">
-        <Button disabled={selectedRow === null} onClick={next}>
+        <Button
+          isLoading={isLoading}
+          disabled={selectedRow === null || isLoading}
+          onClick={next}
+        >
           <ArrowRight /> Next
         </Button>
       </div>

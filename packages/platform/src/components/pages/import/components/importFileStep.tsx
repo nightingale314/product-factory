@@ -16,8 +16,6 @@ export const ImportFileStep = () => {
         const rows = parse(content, {
           columns: false,
           skip_empty_lines: true,
-          from_line: 1,
-          to_line: 3,
           trim: true,
         });
 

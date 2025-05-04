@@ -15,9 +15,9 @@ export interface GetImportTaskInput {
 export type GetImportTaskOutput = ServerResponse<ProductImportTask>;
 
 export type CreateImportTaskInput = {
-  fileUrl: string;
+  fileKey: string;
   taskType: "IMPORT" | "GENERATE_MAPPINGS";
-  taskId?: string;
+  id?: string;
   headerIndex?: number;
   selectedMappings?: ImportProductsAttributeMapping[];
 };

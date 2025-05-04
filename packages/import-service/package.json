@@ -5,10 +5,15 @@
   "engines": {
     "node": ">=20"
   },
+  "scripts": {
+    "deploy": "AWS_PROFILE=ai-product-hub serverless deploy",
+    "dev:testHandler": "serverless invoke local --function testHandler --path ./mock-data/test_download.json"
+  },
   "devDependencies": {
     "@product-factory/database": "workspace:^",
     "@product-factory/openai-lib": "workspace:^",
     "@types/aws-lambda": "^8.10.149",
+    "prisma": "^6.5.0",
     "serverless": "^4.14.1",
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-lift": "^1.31.0",
@@ -20,6 +25,7 @@
     "@aws-sdk/client-lambda": "^3.782.0",
     "@aws-sdk/client-s3": "^3.782.0",
     "@aws-sdk/client-sqs": "^3.782.0",
+    "@prisma/client": "^6.5.0",
     "aws-lambda": "^1.0.7",
     "csv-parser": "^3.2.0",
     "dotenv": "^16.4.7"

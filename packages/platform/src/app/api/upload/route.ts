@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     const arrayBuffer = await file.arrayBuffer();
     const body = new Uint8Array(arrayBuffer);
-    const key = `${supplierId}/${file.name}`; // Create supplier-specific folder
+    const key = `${supplierId}/${Date.now()}_${file.name}`; // Create supplier-specific folder
 
     const command = new PutObjectCommand({
       Bucket: targetBucket,
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     const response: UploadFileResponse = {
       fileName: file.name,
-      url: key,
+      fileKey: key,
       size: file.size,
       type: file.type,
     };
@@ -65,8 +65,9 @@ export async function POST(request: NextRequest) {
       data: response,
       errorCode: ServerErrorCode.SUCCESS,
     });
-  } catch (error) {
-    console.error("Upload error:", error);
+  } catch (err) {
+    const error = err as Error;
+    console.error("Upload error:", error?.message);
     return NextResponse.json(
       {
         message: `Error: ${error}`,

@@ -20,7 +20,7 @@ model ProductImportTask {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   supplierId Int
-  fileUrl String
+  fileKey String
   step ProductImportStep?
   mappings Json?
   selectedHeaderIndex Int

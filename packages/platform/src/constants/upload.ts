@@ -1,3 +1,3 @@
 export enum UploadTarget {
-  PRODUCT_IMPORT = "product-import",
+  PRODUCT_IMPORT = "ai-product-hub-product-import",
 }
