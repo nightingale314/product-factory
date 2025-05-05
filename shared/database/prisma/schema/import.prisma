@@ -25,6 +25,7 @@ model ProductImportTask {
   mappings Json?
   selectedHeaderIndex Int
   totalProductsImported Int?
+  totalProductsSkipped Int?
   aborted Boolean @default(false)
   supplier Supplier @relation(fields: [supplierId], references: [id])
   rowWithIssues Json?

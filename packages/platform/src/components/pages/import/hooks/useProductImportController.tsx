@@ -11,7 +11,6 @@ import {
 } from "react";
 import { ImportStep } from "../constants";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 export interface ImportHeaders {
   columns: string[];
@@ -55,8 +54,6 @@ export const ProductImportProvider = ({
     activeTask?.step === ProductImportStep.PRODUCT_IMPORT ||
       activeTask?.step === ProductImportStep.MAPPING_GENERATION
   );
-  const router = useRouter();
-
   const getHeaders = useCallback(async (csvFile: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
