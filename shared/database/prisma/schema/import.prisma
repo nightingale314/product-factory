@@ -20,11 +20,12 @@ model ProductImportTask {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   supplierId Int
-  fileUrl String
+  fileKey String
   step ProductImportStep?
   mappings Json?
   selectedHeaderIndex Int
   totalProductsImported Int?
+  totalProductsSkipped Int?
   aborted Boolean @default(false)
   supplier Supplier @relation(fields: [supplierId], references: [id])
   rowWithIssues Json?

@@ -1,9 +1,9 @@
-import { Attribute, AttributeType, Product } from "@prisma/client";
+import { Attribute, Prisma, Product } from "@prisma/client";
 import { Readable } from "stream";
 import csv from "csv-parser";
 import { RESERVED_ATTRIBUTE_IDS } from "../enums";
 import { isReservedAttribute, parseAttributeValue } from "./attribute";
-import { JsonValue } from "@prisma/client/runtime/library";
+import { InputJsonValue } from "@prisma/client/runtime/library";
 
 type CsvRow = string[];
 
@@ -30,7 +30,7 @@ type ImportProductsResult = {
     product: Pick<Product, "name" | "skuId">;
     attributes: Array<{
       attributeId: string;
-      value: JsonValue;
+      value: InputJsonValue | typeof Prisma.JsonNull;
     }>;
   }>;
   rowWithIssues?: Array<ImportProductsRowIssue>;
@@ -95,14 +95,18 @@ export const generateProductsFromMappings = async ({
                 if (!mappedAttribute) return null;
 
                 const rawValue = row[mapping.columnIndex];
-
                 return {
                   attributeId: mapping.targetAttributeId,
-                  value: parseAttributeValue(rawValue, mappedAttribute),
+                  value: parseAttributeValue({
+                    value: rawValue,
+                    attribute: mappedAttribute,
+                  }),
                 };
               })
               .filter(
-                (attr): attr is { attributeId: string; value: JsonValue } =>
+                (
+                  attr
+                ): attr is { attributeId: string; value: InputJsonValue } =>
                   attr !== null && attr?.value !== null
               );
 

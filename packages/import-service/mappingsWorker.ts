@@ -9,7 +9,6 @@ interface QueueMessage {
   headerIndex: number;
 }
 
-// Initialize Prisma Client outside handler for connection reuse across invocations
 let prisma: PrismaClient;
 const getPrismaClient = () => {
   if (!prisma) {
@@ -25,6 +24,8 @@ export const handler = async (event: SQSEvent) => {
   for (const record of event.Records) {
     try {
       const message = JSON.parse(record.body) as QueueMessage;
+
+      console.log("Processing:", message);
 
       const [attributes, task] = await Promise.all([
         db.attribute.findMany({
@@ -55,13 +56,25 @@ export const handler = async (event: SQSEvent) => {
         continue;
       }
 
-      const stream = await downloadFileFromS3(task.fileUrl);
+      const stream = await downloadFileFromS3({
+        bucket: process.env.PRODUCT_IMPORT_BUCKET_NAME as string,
+        fileKey: task.fileKey,
+      });
 
       if (!stream) {
         failedMessageIds.push(record.messageId);
         console.error(
           `Failed to download file for message ${record.messageId}`
         );
+
+        await db.productImportTask.update({
+          where: {
+            id: message.taskId,
+          },
+          data: {
+            aborted: true,
+          },
+        });
         continue;
       }
 
@@ -87,6 +100,8 @@ export const handler = async (event: SQSEvent) => {
       failedMessageIds.push(record.messageId);
     }
   }
+
+  prisma?.$disconnect();
 
   return failedMessageIds.length > 0
     ? {

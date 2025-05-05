@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductImportTask } from "@prisma/client";
+import { ProductImportStep, ProductImportTask } from "@prisma/client";
 import { parse } from "csv-parse/sync";
 import {
   createContext,
@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { ImportStep } from "../constants";
+import { toast } from "sonner";
 
 export interface ImportHeaders {
   columns: string[];
@@ -19,10 +20,15 @@ interface ProductImportContextType {
   headers: ImportHeaders[] | null;
   task: ProductImportTask | null;
   step: ImportStep;
+  setStep: (step: ImportStep) => void;
   reset: () => void;
-  nextStep: () => void;
+  nextStep: ({ shouldPoll }: { shouldPoll?: boolean }) => void;
   previousStep: () => void;
   onFileChange: (file: File) => void;
+  setTask: (task: ProductImportTask) => void;
+  setShouldPoll: (shouldPoll: boolean) => void;
+  file?: File | null;
+  shouldPoll: boolean;
 }
 
 const ProductImportContext = createContext<ProductImportContextType | null>(
@@ -40,13 +46,14 @@ export const ProductImportProvider = ({
   activeTask,
   initialStep,
 }: ProductImportProviderProps) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [task, setTask] = useState<ProductImportTask | null>(activeTask);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [file, setFile] = useState<File | null>();
   const [headers, setHeaders] = useState<ImportHeaders[] | null>(null);
   const [step, setStep] = useState<ImportStep>(initialStep);
-
+  const [shouldPoll, setShouldPoll] = useState(
+    activeTask?.step === ProductImportStep.PRODUCT_IMPORT ||
+      activeTask?.step === ProductImportStep.MAPPING_GENERATION
+  );
   const getHeaders = useCallback(async (csvFile: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -55,25 +62,29 @@ export const ProductImportProvider = ({
         const rows = parse(content, {
           columns: false,
           skip_empty_lines: true,
-          from_line: 1,
-          to_line: 6,
           trim: true,
           skipRecordsWithError: true,
           relax_column_count: true,
           skip_records_with_empty_values: true,
         });
 
-        const formattedRows = rows.map((row: string[]) => ({
+        if (rows.length < 1) {
+          throw new Error("File must have at least 1 row");
+        }
+        const formattedRows = rows.slice(0, 6).map((row: string[]) => ({
           columns: row.map((cell) =>
             cell.length > 20 ? cell.substring(0, 20) + "..." : cell
           ),
         }));
+
+        console.log({ formattedRows });
 
         setHeaders(formattedRows);
         setStep(ImportStep.SELECT_HEADERS);
       } catch (error) {
         const err = error as Error;
         console.error("Error parsing CSV:", err.message);
+        toast.error(err.message);
       }
     };
     reader.readAsText(csvFile!);
@@ -87,11 +98,18 @@ export const ProductImportProvider = ({
     [getHeaders]
   );
 
-  const nextStep = useCallback(() => {
-    if (step !== null) {
-      setStep(Math.min(step + 1, ImportStep.COMPLETED));
-    }
-  }, [step]);
+  const nextStep = useCallback(
+    (params?: { shouldPoll?: boolean }) => {
+      if (params?.shouldPoll) {
+        setShouldPoll(true);
+      }
+
+      if (step !== null) {
+        setStep(Math.min(step + 1, ImportStep.COMPLETED));
+      }
+    },
+    [step]
+  );
 
   const previousStep = useCallback(() => {
     if (step !== null) {
@@ -100,7 +118,7 @@ export const ProductImportProvider = ({
   }, [step]);
 
   const reset = () => {
-    setStep(ImportStep.UPLOAD_FILE);
+    window.location.reload();
   };
 
   const contextValue = useMemo(
@@ -112,8 +130,23 @@ export const ProductImportProvider = ({
       nextStep,
       previousStep,
       reset,
+      file,
+      setTask,
+      setStep,
+      shouldPoll,
+      setShouldPoll,
     }),
-    [task, headers, step, onFileChange, nextStep, previousStep]
+    [
+      task,
+      headers,
+      step,
+      onFileChange,
+      nextStep,
+      previousStep,
+      file,
+      setTask,
+      shouldPoll,
+    ]
   );
 
   return (

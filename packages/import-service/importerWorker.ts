@@ -23,9 +23,11 @@ export const handler = async (event: SQSEvent) => {
   const db = getPrismaClient();
   const failedMessageIds: string[] = [];
 
-  try {
-    for (const record of event.Records) {
+  for (const record of event.Records) {
+    try {
       const message = JSON.parse(record.body) as QueueMessage;
+
+      console.log("Processing:", message);
 
       const task = await db.productImportTask.findUnique({
         where: {
@@ -39,16 +41,12 @@ export const handler = async (event: SQSEvent) => {
         continue;
       }
 
-      const { step, fileUrl, supplierId, id: taskId } = task;
+      const { fileKey, supplierId, id: taskId } = task;
 
-      if (step !== ProductImportStep.MAPPING_SELECTION) {
-        console.error(`Invalid task ID provided: ${taskId}`);
-        failedMessageIds.push(record.messageId);
-
-        continue;
-      }
-
-      const stream = await downloadFileFromS3(fileUrl);
+      const stream = await downloadFileFromS3({
+        bucket: process.env.PRODUCT_IMPORT_BUCKET_NAME as string,
+        fileKey,
+      });
 
       if (!stream) {
         console.error(`Failed to download file for task ${taskId}`);
@@ -75,7 +73,7 @@ export const handler = async (event: SQSEvent) => {
           supplierId,
         }));
 
-      const createdProducts = await prisma.product.createManyAndReturn({
+      const createdProducts = await db.product.createManyAndReturn({
         select: {
           id: true,
           skuId: true,
@@ -83,6 +81,8 @@ export const handler = async (event: SQSEvent) => {
         skipDuplicates: true,
         data: productsToCreate,
       });
+
+      const duplicatedProducts = products.length - createdProducts.length;
 
       const productAttributesToCreate = products.flatMap((i) =>
         i.attributes.flatMap((j) => {
@@ -100,11 +100,11 @@ export const handler = async (event: SQSEvent) => {
         })
       );
 
-      await prisma.productAttribute.createMany({
+      await db.productAttribute.createMany({
         data: productAttributesToCreate,
       });
 
-      await prisma.productImportTask.update({
+      await db.productImportTask.update({
         where: {
           supplierId,
           id: task.id,
@@ -112,24 +112,24 @@ export const handler = async (event: SQSEvent) => {
         data: {
           step: ProductImportStep.COMPLETED,
           totalProductsImported: createdProducts.length,
+          totalProductsSkipped:
+            duplicatedProducts + (rowWithIssues?.length ?? 0),
           rowWithIssues,
         },
       });
 
-      console.log("Processed message:", message);
+      console.log(`Product imported for task ${taskId}`);
+    } catch (error) {
+      console.error(`Error processing message ${record.messageId}:`, error);
+      failedMessageIds.push(record.messageId);
     }
 
-    return {
-      batchItemFailures: failedMessageIds.map((id) => ({
-        itemIdentifier: id,
-      })),
-    };
-  } catch (error) {
-    console.error("Error processing messages:", error);
-    return {
-      batchItemFailures: event.Records.map((record) => ({
-        itemIdentifier: record.messageId,
-      })),
-    };
+    return failedMessageIds.length > 0
+      ? {
+          batchItemFailures: failedMessageIds.map((id) => ({
+            itemIdentifier: id,
+          })),
+        }
+      : null;
   }
 };

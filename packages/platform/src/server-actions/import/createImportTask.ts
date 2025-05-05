@@ -3,11 +3,18 @@
 import { getAuthSession } from "@/lib/auth/getAuthSession";
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 import { fromEnv } from "@aws-sdk/credential-providers";
+import { CreateImportTaskInput, CreateImportTaskOutput } from "@/types/product";
+import { ServerErrorCode } from "@/enums/common";
+import { ProductImportTask } from "@prisma/client";
 
+type StartImportTaskEventResponse = {
+  errorCode: number;
+  message?: string;
+  data: ProductImportTask;
+};
 export const createImportTask = async (
-  fileUrl: string,
-  headerIndex: number
-) => {
+  input: CreateImportTaskInput
+): Promise<CreateImportTaskOutput> => {
   const session = await getAuthSession();
 
   try {
@@ -20,18 +27,20 @@ export const createImportTask = async (
       ? `${process.env.IMPORT_SERVICE_NAME}-startImportTask`
       : "";
 
-    console.log("Invoking function:", functionName);
+    const inputPayload = {
+      supplierId: session.user.supplierId,
+      taskType: input.taskType,
+      fileKey: input.fileKey,
+      headerIndex: input.headerIndex,
+      taskId: input.taskId,
+      selectedMappings: input.selectedMappings,
+    };
+
+    console.log("payload", inputPayload);
 
     const command = new InvokeCommand({
       FunctionName: functionName,
-      Payload: Buffer.from(
-        JSON.stringify({
-          taskType: "GENERATE_MAPPINGS",
-          supplierId: session.user.supplierId,
-          fileUrl,
-          headerIndex,
-        })
-      ),
+      Payload: JSON.stringify(inputPayload),
     });
 
     const response = await client.send(command);
@@ -40,13 +49,24 @@ export const createImportTask = async (
       throw new Error(`Lambda invocation failed: ${response.FunctionError}`);
     }
 
-    const payload = response.Payload
+    const payload: StartImportTaskEventResponse | null = response.Payload
       ? JSON.parse(Buffer.from(response.Payload).toString())
       : null;
 
-    return payload;
+    if (payload?.errorCode || !payload?.data) {
+      throw new Error(payload?.message ?? "Start import task lambda failed");
+    }
+
+    return {
+      data: payload.data,
+      errorCode: ServerErrorCode.SUCCESS,
+    };
   } catch (error) {
     console.error("Lambda invocation error:", error);
-    throw error;
+    return {
+      errorCode: ServerErrorCode.UNEXPECTED_ERROR,
+      message: "Failed to create import task. Please try again later.",
+      data: null,
+    };
   }
 };

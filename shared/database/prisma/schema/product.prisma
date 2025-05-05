@@ -5,10 +5,13 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   name String
-  skuId String @unique
+  skuId String
   supplier Supplier @relation(fields: [supplierId], references: [id])
   attributes ProductAttribute[]
 
+
+  // Composite unique constraint
+  @@unique([supplierId, skuId])
   @@index([supplierId])
   @@index([name])
   @@map("product")

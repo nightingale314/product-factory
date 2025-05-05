@@ -16,6 +16,7 @@ export const getActiveImportLoader =
       const activeImport = await prisma.productImportTask.findFirst({
         where: {
           supplierId: user.supplierId,
+          aborted: false,
           OR: [
             { step: ProductImportStep.MAPPING_SELECTION },
             { step: ProductImportStep.PRODUCT_IMPORT },

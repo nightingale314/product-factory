@@ -4,6 +4,7 @@ import { UploadFileButton } from "@/components/composition/upload";
 import { parse } from "csv-parse/sync";
 import { toast } from "sonner";
 import { useProductImportController } from "../hooks/useProductImportController";
+import { Instructions } from "./Instructions";
 
 export const ImportFileStep = () => {
   const { onFileChange } = useProductImportController();
@@ -16,8 +17,6 @@ export const ImportFileStep = () => {
         const rows = parse(content, {
           columns: false,
           skip_empty_lines: true,
-          from_line: 1,
-          to_line: 3,
           trim: true,
         });
 
@@ -37,6 +36,16 @@ export const ImportFileStep = () => {
 
   return (
     <div className="grow flex flex-col gap-4 items-center justify-center">
+      <Instructions
+        title="Import value guidelines"
+        instructions={[
+          "For Select and Multi-Select attributes, the values must be comma-separated.",
+          "For Measure attributes, the values must be in the format of '{value} {unit}'.",
+          "For Media attributes, the values must be comma-separated URLs.",
+          "For Boolean attributes, the values must be 'true' or 'false', case-insensitive.",
+          "If the above guidelines are not followed, the value will not be mapped.",
+        ]}
+      />
       <UploadFileButton onFileUpload={verifyFile} />
       <p className="text-sm text-muted-foreground">
         Upload a CSV file with products using the given template.

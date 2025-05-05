@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { ImportContent } from "./ImportContent";
-import { ImportSkeleton } from "./ImportSkeleton";
+import { ImportSkeleton } from "./components/skeleton/ImportSkeleton";
 import { PageHeader } from "@/components/composition/page-header";
 
 export const ProductImportIndex = async () => {
