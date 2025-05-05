@@ -47,14 +47,14 @@ export const handler = async (event: CreateImportTaskEvent) => {
   let taskId: string | undefined;
 
   try {
+    const db = getPrismaClient();
+
     if (event.taskType === "GENERATE_MAPPINGS") {
       if (event.headerIndex === undefined || event.fileKey === undefined) {
         throw new Error(
           "Inalid arguments, check that header index and file URL are provided"
         );
       }
-
-      const db = getPrismaClient();
 
       // Allow regeneration of mappings, maybe user added new attributes.
       if (event.taskId) {
@@ -88,6 +88,14 @@ export const handler = async (event: CreateImportTaskEvent) => {
         throw new Error("Invalid mappings provided");
       }
 
+      task = await db.productImportTask.update({
+        where: {
+          id: event.taskId,
+        },
+        data: {
+          step: ProductImportStep.PRODUCT_IMPORT,
+        },
+      });
       taskId = event.taskId;
     }
 

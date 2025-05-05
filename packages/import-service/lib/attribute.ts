@@ -10,37 +10,71 @@ export const isReservedAttribute = (
   );
 };
 
-export const parseAttributeValue = (
-  value: string,
-  attribute: Attribute
-): InputJsonValue | typeof Prisma.JsonNull => {
+export const parseAttributeValue = ({
+  value,
+  attribute,
+}: {
+  value?: string | null;
+  attribute: Attribute;
+}): InputJsonValue | null => {
   const { type } = attribute;
+
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
 
   try {
     switch (type) {
       case "NUMBER": {
+        if (Number.isNaN(Number(value))) {
+          return null;
+        }
+
         return Number(value);
       }
       case "BOOLEAN": {
         return value.toLowerCase() === "true";
       }
       case "DATE": {
+        if (Number.isNaN(new Date(value).getTime())) {
+          return null;
+        }
+
         return new Date(value).getTime();
       }
 
       case "SINGLE_SELECT": {
-        return value;
+        if (attribute.selectOptions.includes(value.trim())) {
+          return value.trim();
+        }
+
+        return null;
       }
 
       case "MULTI_SELECT": {
-        return value
+        const parsedValue = value
           .split(",")
           .map((v) => v.trim())
           .filter((i) => !!i);
+
+        if (parsedValue.every((i) => attribute.selectOptions.includes(i))) {
+          return parsedValue;
+        }
+
+        return null;
       }
       case "MEASURE": {
         const [val, unit] = value.split(" ");
-        return { value: Number(val), unit };
+
+        if (attribute.measureUnits.includes(unit.trim())) {
+          if (Number.isNaN(Number(val))) {
+            return null;
+          }
+
+          return { value: Number(val), unit: unit.trim() };
+        }
+
+        return null;
       }
       case "MEDIA": {
         return value

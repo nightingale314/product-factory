@@ -95,10 +95,12 @@ export const generateProductsFromMappings = async ({
                 if (!mappedAttribute) return null;
 
                 const rawValue = row[mapping.columnIndex];
-
                 return {
                   attributeId: mapping.targetAttributeId,
-                  value: parseAttributeValue(rawValue, mappedAttribute),
+                  value: parseAttributeValue({
+                    value: rawValue,
+                    attribute: mappedAttribute,
+                  }),
                 };
               })
               .filter(

@@ -41,14 +41,7 @@ export const handler = async (event: SQSEvent) => {
         continue;
       }
 
-      const { step, fileKey, supplierId, id: taskId } = task;
-
-      if (step !== ProductImportStep.MAPPING_SELECTION) {
-        console.error(`Invalid task ID provided: ${taskId}`);
-        failedMessageIds.push(record.messageId);
-
-        continue;
-      }
+      const { fileKey, supplierId, id: taskId } = task;
 
       const stream = await downloadFileFromS3({
         bucket: process.env.PRODUCT_IMPORT_BUCKET_NAME as string,
@@ -89,6 +82,8 @@ export const handler = async (event: SQSEvent) => {
         data: productsToCreate,
       });
 
+      const duplicatedProducts = products.length - createdProducts.length;
+
       const productAttributesToCreate = products.flatMap((i) =>
         i.attributes.flatMap((j) => {
           const createdProduct = createdProducts.find(
@@ -117,6 +112,8 @@ export const handler = async (event: SQSEvent) => {
         data: {
           step: ProductImportStep.COMPLETED,
           totalProductsImported: createdProducts.length,
+          totalProductsSkipped:
+            duplicatedProducts + (rowWithIssues?.length ?? 0),
           rowWithIssues,
         },
       });
