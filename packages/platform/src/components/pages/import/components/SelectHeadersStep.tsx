@@ -17,9 +17,11 @@ import { UploadTarget } from "@/constants/upload";
 import { uploadFile } from "@/lib/upload";
 import { toast } from "sonner";
 import { RESERVED_ATTRIBUTE_IDS } from "@product-factory/import-service/enums";
+import { Instructions } from "./Instructions";
 
 export const SelectHeadersStep = () => {
-  const { headers, file, nextStep, setTask } = useProductImportController();
+  const { headers, file, nextStep, setTask, reset } =
+    useProductImportController();
   const [selectedRow, setSelectedRow] = useState<number | null>(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,7 +65,7 @@ export const SelectHeadersStep = () => {
       }
 
       setTask(task.data);
-      nextStep();
+      nextStep({ shouldPoll: true });
     } catch (err) {
       const error = err as Error;
       toast.error(
@@ -76,21 +78,13 @@ export const SelectHeadersStep = () => {
 
   return (
     <div className="grow flex flex-col gap-4 w-full p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h4 className="">Select the header row of your CSV file</h4>
-          <ul className="list-disc list-outside ml-4">
-            <li className="text-sm text-muted-foreground">
-              The header row is the row that contains the value that identifies
-              your attribute.
-            </li>
-            <li className="text-sm text-muted-foreground">
-              Ensure that the selected header row contains the reserved column
-              name of &apos;productName&apos; and &apos;skuId&apos;.
-            </li>
-          </ul>
-        </div>
-      </div>
+      <Instructions
+        title="Select the header row of your CSV file"
+        instructions={[
+          "The header row is the row that contains the value that identifies your attribute.",
+          "Ensure that the selected header row contains the reserved column name of 'productName' and 'skuId'.",
+        ]}
+      />
       <div className="w-full overflow-x-auto">
         <Table className="w-full border-collapse">
           <TableHeader>
@@ -140,7 +134,10 @@ export const SelectHeadersStep = () => {
           </TableBody>
         </Table>
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-between">
+        <Button disabled={isLoading} onClick={reset} variant="outline">
+          Cancel
+        </Button>
         <Button
           isLoading={isLoading}
           disabled={selectedRow === null || isLoading}

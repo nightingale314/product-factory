@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductImportTask } from "@prisma/client";
+import { ProductImportStep, ProductImportTask } from "@prisma/client";
 import { parse } from "csv-parse/sync";
 import {
   createContext,
@@ -11,6 +11,7 @@ import {
 } from "react";
 import { ImportStep } from "../constants";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export interface ImportHeaders {
   columns: string[];
@@ -20,12 +21,15 @@ interface ProductImportContextType {
   headers: ImportHeaders[] | null;
   task: ProductImportTask | null;
   step: ImportStep;
+  setStep: (step: ImportStep) => void;
   reset: () => void;
-  nextStep: () => void;
+  nextStep: ({ shouldPoll }: { shouldPoll?: boolean }) => void;
   previousStep: () => void;
   onFileChange: (file: File) => void;
   setTask: (task: ProductImportTask) => void;
+  setShouldPoll: (shouldPoll: boolean) => void;
   file?: File | null;
+  shouldPoll: boolean;
 }
 
 const ProductImportContext = createContext<ProductImportContextType | null>(
@@ -47,6 +51,11 @@ export const ProductImportProvider = ({
   const [file, setFile] = useState<File | null>();
   const [headers, setHeaders] = useState<ImportHeaders[] | null>(null);
   const [step, setStep] = useState<ImportStep>(initialStep);
+  const [shouldPoll, setShouldPoll] = useState(
+    activeTask?.step === ProductImportStep.PRODUCT_IMPORT ||
+      activeTask?.step === ProductImportStep.MAPPING_GENERATION
+  );
+  const router = useRouter();
 
   const getHeaders = useCallback(async (csvFile: File) => {
     const reader = new FileReader();
@@ -92,11 +101,18 @@ export const ProductImportProvider = ({
     [getHeaders]
   );
 
-  const nextStep = useCallback(() => {
-    if (step !== null) {
-      setStep(Math.min(step + 1, ImportStep.COMPLETED));
-    }
-  }, [step]);
+  const nextStep = useCallback(
+    (params?: { shouldPoll?: boolean }) => {
+      if (params?.shouldPoll) {
+        setShouldPoll(true);
+      }
+
+      if (step !== null) {
+        setStep(Math.min(step + 1, ImportStep.COMPLETED));
+      }
+    },
+    [step]
+  );
 
   const previousStep = useCallback(() => {
     if (step !== null) {
@@ -105,7 +121,7 @@ export const ProductImportProvider = ({
   }, [step]);
 
   const reset = () => {
-    setStep(ImportStep.UPLOAD_FILE);
+    window.location.reload();
   };
 
   const contextValue = useMemo(
@@ -119,8 +135,21 @@ export const ProductImportProvider = ({
       reset,
       file,
       setTask,
+      setStep,
+      shouldPoll,
+      setShouldPoll,
     }),
-    [task, headers, step, onFileChange, nextStep, previousStep, file, setTask]
+    [
+      task,
+      headers,
+      step,
+      onFileChange,
+      nextStep,
+      previousStep,
+      file,
+      setTask,
+      shouldPoll,
+    ]
   );
 
   return (

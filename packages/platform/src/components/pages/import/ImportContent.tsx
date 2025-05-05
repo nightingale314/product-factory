@@ -6,7 +6,6 @@ import { StepHeader } from "./components/StepHeader";
 
 export const ImportContent = async () => {
   const { data: activeTask } = await getActiveImportLoader();
-
   const initialStep = getStepFromTaskStep(activeTask?.step);
 
   return (

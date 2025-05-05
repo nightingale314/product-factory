@@ -15,11 +15,17 @@ export interface GetImportTaskInput {
 export type GetImportTaskOutput = ServerResponse<ProductImportTask>;
 
 export type CreateImportTaskInput = {
-  fileKey: string;
+  fileKey?: string;
   taskType: "IMPORT" | "GENERATE_MAPPINGS";
-  id?: string;
+  taskId?: string;
   headerIndex?: number;
   selectedMappings?: ImportProductsAttributeMapping[];
 };
 
 export type CreateImportTaskOutput = ServerResponse<ProductImportTask>;
+
+export type CancelImportTaskInput = {
+  taskId: string;
+};
+
+export type CancelImportTaskOutput = ServerResponse<ProductImportTask>;

@@ -4,11 +4,20 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({
+  className,
+  maxHeight = 555,
+  ...props
+}: React.ComponentProps<"table"> & {
+  maxHeight?: number;
+}) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-auto max-h-[555px]"
+      className="relative w-full overflow-auto min-h-0"
+      style={{
+        maxHeight: `${maxHeight}px`,
+      }}
     >
       <table
         data-slot="table"
@@ -23,7 +32,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b sticky top-0 z-[1]", className)}
+      className={cn("[&_tr]:border-b sticky top-0 z-[1] bg-white", className)}
       {...props}
     />
   );

@@ -32,7 +32,7 @@ export const createImportTask = async (
       taskType: input.taskType,
       fileKey: input.fileKey,
       headerIndex: input.headerIndex,
-      taskId: input.id,
+      taskId: input.taskId,
       selectedMappings: input.selectedMappings,
     };
 
