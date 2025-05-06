@@ -1,5 +1,9 @@
 import { Product, ProductAttribute, ProductImportTask } from "@prisma/client";
-import { ServerResponse } from "./common";
+import {
+  ServerResponse,
+  ServerResponseList,
+  WithPaginationSort,
+} from "./common";
 import { ImportProductsAttributeMapping } from "@product-factory/import-service/lib/generateProductsFromMappings";
 
 export type ProductWithAttributes = Product & {
@@ -29,3 +33,11 @@ export type CancelImportTaskInput = {
 };
 
 export type CancelImportTaskOutput = ServerResponse<ProductImportTask>;
+
+export interface ListProductInput extends WithPaginationSort<Product> {
+  filter?: {
+    searchString?: string;
+  };
+}
+
+export type ListProductOutput = ServerResponseList<ProductWithAttributes>;

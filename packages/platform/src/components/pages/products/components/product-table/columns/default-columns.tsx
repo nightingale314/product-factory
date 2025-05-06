@@ -8,17 +8,9 @@ import { TextCell } from "../cells/TextCell";
 
 export const DEFAULT_COLUMNS: ColumnDef<ProductWithAttributes>[] = [
   {
-    id: "name",
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => {
-      return <TextCell value={row.original.name} attribute={null} />;
-    },
-  },
-  {
     id: "skuId",
     accessorKey: "skuId",
-    header: "Name",
+    header: "SKU ID",
     cell: ({ row }) => {
       return (
         <Link href={routes.products.detail(row.original.id)}>
@@ -30,9 +22,18 @@ export const DEFAULT_COLUMNS: ColumnDef<ProductWithAttributes>[] = [
     },
   },
   {
+    id: "name",
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => {
+      return <TextCell value={row.original.name} attribute={null} />;
+    },
+  },
+  {
     id: "createdAt",
     accessorKey: "createdAt",
     header: "Created At",
+
     cell: ({ row }) => {
       return <DateTimeCell value={row.original.createdAt} />;
     },

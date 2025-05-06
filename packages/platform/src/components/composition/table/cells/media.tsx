@@ -13,7 +13,7 @@ export const MediaCell = ({ urls }: MediaCellProps) => {
   const image = urls?.[0] ?? "";
 
   return (
-    <div className="h-8 w-8">
+    <div className="h-8 w-8 rounded overflow-clip border">
       {hasError ? (
         // eslint-disable-next-line jsx-a11y/alt-text
         <Image />
@@ -23,7 +23,7 @@ export const MediaCell = ({ urls }: MediaCellProps) => {
           src={image}
           alt="image"
           onError={() => setHasError(true)}
-          className="w-full h-full"
+          className="w-full h-full object-contain"
         />
       )}
     </div>
