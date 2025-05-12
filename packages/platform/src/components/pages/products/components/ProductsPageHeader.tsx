@@ -2,7 +2,6 @@ import { PageHeader } from "@/components/composition/page-header";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/constants/routes";
 import Link from "next/link";
-import { ProductDataTable } from "./product-table/ProductDataTable";
 
 export const ProductPageHeader = () => {
   return (
@@ -12,7 +11,6 @@ export const ProductPageHeader = () => {
           <Button>Import products</Button>
         </Link>
       </PageHeader>
-      <ProductDataTable />
     </div>
   );
 };
