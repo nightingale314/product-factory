@@ -1,12 +1,14 @@
 import { AttributeDataTable } from "./AttributeDataTable";
 import { listAttributeLoader } from "@/server-loader/attributes/listAttributeLoader";
 import { PageProps } from "@/types/common";
-import { listAttributesSearchParamsLoader } from "../../search-params/listAttributes";
+import { loadQueryValues } from "@/lib/parsers/helpers";
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/constants/common";
+import { paginationParser } from "@/lib/parsers/common-parsers";
 
 export const AttributeTable = async ({ searchParams }: PageProps) => {
-  const { page, pageSize } = await listAttributesSearchParamsLoader(
-    searchParams
-  );
+  const queryValues = await loadQueryValues(searchParams);
+  const { page = DEFAULT_PAGE, pageSize = DEFAULT_PAGE_SIZE } =
+    paginationParser(queryValues);
 
   const { data } = await listAttributeLoader({
     pagination: { page, pageSize },
@@ -14,7 +16,11 @@ export const AttributeTable = async ({ searchParams }: PageProps) => {
 
   return (
     <div className="container mx-auto">
-      <AttributeDataTable data={data?.result ?? []} total={data?.total ?? 0} />
+      <AttributeDataTable
+        data={data?.result ?? []}
+        total={data?.total ?? 0}
+        initialQueryValues={queryValues}
+      />
     </div>
   );
 };

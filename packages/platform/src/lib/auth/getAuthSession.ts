@@ -10,7 +10,10 @@ type CustomAuthSession = Omit<Session, "user"> & {
 };
 
 export async function getAuthSession() {
+  const start = Date.now();
   const session = await auth();
+  const end = Date.now();
+  console.log(`Get auth session: ${end - start} ms`);
 
   if (!session || !session?.user) {
     redirect(routes.login);

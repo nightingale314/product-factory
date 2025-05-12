@@ -1,11 +1,17 @@
 import { PageProps } from "@/types/common";
-import { listProductsSearchParamsLoader } from "./search-params/listProducts";
 import { listProductLoader } from "@/server-loader/products/listProductLoader";
 import { listAttributeLoader } from "@/server-loader/attributes/listAttributeLoader";
 import { ProductDataTable } from "./ProductDataTable";
+import { loadQueryValues } from "@/lib/parsers/helpers";
+import { DEFAULT_PAGE_SIZE } from "@/constants/common";
+import { DEFAULT_PAGE } from "@/constants/common";
+import { paginationParser } from "@/lib/parsers/common-parsers";
 
 export const ProductTable = async ({ searchParams }: PageProps) => {
-  const { page, pageSize } = await listProductsSearchParamsLoader(searchParams);
+  const queryValues = await loadQueryValues(searchParams);
+
+  const { page = DEFAULT_PAGE, pageSize = DEFAULT_PAGE_SIZE } =
+    paginationParser(queryValues);
 
   const [products, attributes] = await Promise.all([
     await listProductLoader({
@@ -22,6 +28,7 @@ export const ProductTable = async ({ searchParams }: PageProps) => {
         data={products?.data?.result ?? []}
         total={products?.data?.total ?? 0}
         supplierAttributes={attributes?.data?.result ?? []}
+        initialQueryValues={queryValues}
       />
     </div>
   );
