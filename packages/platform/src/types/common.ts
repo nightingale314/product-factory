@@ -1,5 +1,5 @@
 import { ServerErrorCode, SortEnum } from "@/enums/common";
-import { SearchParams } from "next/dist/server/request/search-params";
+import { SearchParams } from "@/lib/parsers/types";
 
 export interface Pagination {
   page: number;

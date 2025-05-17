@@ -1,11 +1,7 @@
-import { SearchParams } from "next/dist/server/request/search-params";
-import {
-  AvailableRangeEndOperators,
-  AvailableRangeStartOperators,
-  decodeQuery,
-  QueryValue,
-} from "./parsers";
+import { decodeQuery } from "./parsers";
 import { QueryType } from "./enums";
+import { AvailableRangeEndOperators, QueryValue, SearchParams } from "./types";
+import { AvailableRangeStartOperators } from "./types";
 
 export type QueryValueByType<T extends QueryType> = T extends QueryType.STRING
   ? string
