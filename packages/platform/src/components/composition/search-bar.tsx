@@ -7,16 +7,18 @@ interface SearchBarProps {
   className?: string;
   placeholder?: string;
   onChange?: (value: string) => void;
+  debounceTime?: number;
 }
 
 export const SearchBar = ({
   className,
   placeholder,
   onChange,
+  debounceTime = 300,
 }: SearchBarProps) => {
   const debouncedOnChange = useCallback(
-    debounce((value: string) => onChange?.(value), 300),
-    []
+    debounce((value: string) => onChange?.(value), debounceTime),
+    [debounceTime]
   );
 
   return (
