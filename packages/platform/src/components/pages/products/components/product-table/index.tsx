@@ -1,11 +1,11 @@
 import { PageProps } from "@/types/common";
-import { listProductLoader } from "@/server-loader/products/listProductLoader";
-import { listAttributeLoader } from "@/server-loader/attributes/listAttributeLoader";
-import { ProductDataTable } from "./ProductDataTable";
 import { loadQueryValues } from "@/lib/parsers/helpers";
 import { DEFAULT_PAGE_SIZE } from "@/constants/common";
 import { DEFAULT_PAGE } from "@/constants/common";
 import { paginationParser } from "@/lib/parsers/common-parsers";
+import { ProductDataTable } from "./ProductDataTable";
+import { listProductLoader } from "@/server-loader/products/listProductLoader";
+import { listAttributeLoader } from "@/server-loader/attributes/listAttributeLoader";
 
 export const ProductTable = async ({ searchParams }: PageProps) => {
   const queryValues = await loadQueryValues(searchParams);

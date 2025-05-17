@@ -8,8 +8,8 @@ import { useEffect, useState } from "react";
 import { useQueryParams } from "@/hooks/use-query-state";
 import { QueryOperator, QueryType } from "@/lib/parsers/enums";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/constants/common";
-import { QueryValue } from "@/lib/parsers/parsers";
 import { paginationParser } from "@/lib/parsers/common-parsers";
+import { QueryValue } from "@/lib/parsers/types";
 
 interface AttributeDataTableProps {
   data: Attribute[];
