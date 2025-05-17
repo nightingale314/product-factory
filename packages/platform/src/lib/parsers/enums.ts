@@ -5,6 +5,7 @@ export enum QueryType {
   BOOLEAN = "BOOLEAN",
   NUMBER = "NUMBER",
   DATE = "DATE",
+  UNIT = "UNIT",
 }
 
 export enum QueryOperator {

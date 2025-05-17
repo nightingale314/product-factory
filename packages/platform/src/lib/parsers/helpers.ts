@@ -1,5 +1,5 @@
 import { decodeQuery } from "./parsers";
-import { QueryType } from "./enums";
+import { QueryOperator, QueryType } from "./enums";
 import { AvailableRangeEndOperators, QueryValue, SearchParams } from "./types";
 import { AvailableRangeStartOperators } from "./types";
 
@@ -22,6 +22,17 @@ export type QueryValueByType<T extends QueryType> = T extends QueryType.STRING
     }
   : T extends QueryType.BOOLEAN
   ? boolean
+  : T extends QueryType.UNIT
+  ? {
+      quantity: {
+        value: number;
+        operator: AvailableRangeEndOperators;
+      };
+      unit: {
+        value: string;
+        operator: QueryOperator.EQUALS;
+      };
+    }
   : never;
 
 export function getQueryValue<T extends QueryType>(

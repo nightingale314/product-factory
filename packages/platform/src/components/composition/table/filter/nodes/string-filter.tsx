@@ -4,6 +4,13 @@ import { useState } from "react";
 import { QueryOperator } from "@/lib/parsers/enums";
 import { QueryType } from "@/lib/parsers/enums";
 import { NodeContainer } from "./node-container";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type StringFilterProps = FilterInput & {
   value?: string;
@@ -15,6 +22,7 @@ export const StringFilter = ({
   value,
   onApply,
   renderLabel,
+  options,
 }: StringFilterProps) => {
   const [inputValue, setInputValue] = useState<string>(value ?? "");
 
@@ -30,6 +38,33 @@ export const StringFilter = ({
       value: inputValue,
     });
   };
+
+  if (options?.selectOptions) {
+    return (
+      <NodeContainer
+        label={label}
+        selectedOperator={QueryOperator.EQUALS}
+        onApply={onApplyClick}
+        renderLabel={renderLabel}
+      >
+        <Select
+          defaultValue={value}
+          onValueChange={(value) => setInputValue(value)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a value" />
+          </SelectTrigger>
+          <SelectContent>
+            {options.selectOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </NodeContainer>
+    );
+  }
 
   return (
     <NodeContainer

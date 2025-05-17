@@ -1,5 +1,9 @@
 import { QueryOperator, QueryType } from "./enums";
-import { AvailableRangeStartOperators, QueryValue } from "./types";
+import {
+  AvailableRangeEndOperators,
+  AvailableRangeStartOperators,
+  QueryValue,
+} from "./types";
 
 const getOperatorEncoding = (operator: QueryOperator, key: string) => {
   switch (operator) {
@@ -232,23 +236,30 @@ export const decodeQuery = (
         operator === QueryOperator.GREATER_THAN_OR_EQUAL;
       const side: "min" | "max" = isStart ? "min" : "max";
 
-      if (!map.has(key) || map.get(key)!.type !== QueryType.RANGE) {
-        map.set(key, {
-          key,
-          type: QueryType.RANGE,
-          value: {
-            [side]: { value: num, operator } as {
-              value: number;
-              operator: AvailableRangeStartOperators;
-            },
-          },
-        });
-      } else {
+      if (map.has(key)) {
         const existing = map.get(key)!;
-        existing.value = {
-          ...((typeof existing.value === "object" && existing.value) || {}),
-          [side]: { value: num, operator },
-        };
+        if (existing.type === QueryType.RANGE) {
+          map.set(key, {
+            ...existing,
+            value: {
+              ...existing.value,
+              [side]: { value: num, operator },
+            },
+          });
+        } else {
+          map.set(key, {
+            key,
+            type: QueryType.RANGE,
+            value: {
+              [side]: { value: num, operator } as {
+                value: number;
+                operator:
+                  | AvailableRangeStartOperators
+                  | AvailableRangeEndOperators;
+              },
+            },
+          });
+        }
       }
       continue;
     }

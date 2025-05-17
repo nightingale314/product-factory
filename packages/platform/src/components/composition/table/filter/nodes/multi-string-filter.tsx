@@ -8,7 +8,6 @@ import { MultiAsyncSelect } from "@/components/ui/multi-select";
 
 type MultiStringFilterProps = FilterInput & {
   value?: string[];
-  options: { label: string; value: string }[];
 };
 
 export const MultiStringFilter = ({
@@ -19,8 +18,6 @@ export const MultiStringFilter = ({
   onApply,
 }: MultiStringFilterProps) => {
   const [inputValue, setInputValue] = useState<string[]>(value ?? []);
-
-  console.log({ options });
 
   const onApplyClick = () => {
     onApply({
@@ -40,7 +37,7 @@ export const MultiStringFilter = ({
       <MultiAsyncSelect
         placeholder="Select a value"
         defaultValue={value}
-        options={options}
+        options={options?.selectOptions ?? []}
         onValueChange={(value) => setInputValue(value)}
       />
     </NodeContainer>

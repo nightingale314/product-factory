@@ -12,24 +12,26 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const MAX_FILTERS = 3;
+const MAX_FILTERS = 10;
 
 export const TableFilter = ({
   filterValues,
   availableFilterNodes,
   hiddenKeys,
   onFilterChange,
+  maxFilters = MAX_FILTERS,
 }: {
   filterValues: Map<string, QueryValue>;
   availableFilterNodes: FilterNodeType[];
   hiddenKeys?: string[];
   onFilterChange: (updatedFilterValues: Map<string, QueryValue>) => void;
+  maxFilters?: number;
 }) => {
   const [values, setValues] = useState<Map<string, QueryValue>>(filterValues);
 
   const fixedFilters = availableFilterNodes.filter((f) => f.fixed);
   const dynamicFilters = availableFilterNodes.filter((f) => !f.fixed);
-  const isMaxFiltersReached = values.size >= MAX_FILTERS;
+  const isMaxFiltersReached = values.size >= maxFilters;
 
   const dynamicFilterList = dynamicFilters.filter((f) => {
     const isHidden = (hiddenKeys ?? []).includes(f.key);
@@ -96,7 +98,7 @@ export const TableFilter = ({
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          Only {MAX_FILTERS} filters can be applied at a time
+          Only {maxFilters} filters can be applied at a time
         </TooltipContent>
       </Tooltip>
     </div>

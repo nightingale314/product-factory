@@ -1,8 +1,10 @@
 import { QueryOperator, QueryType } from "./enums";
 
-type AvailableStringOperators = QueryOperator.EQUALS | QueryOperator.NOT_EQUALS;
+export type AvailableStringOperators =
+  | QueryOperator.EQUALS
+  | QueryOperator.NOT_EQUALS;
 
-type AvailableMultiOperators = QueryOperator.IN | QueryOperator.NOT_IN;
+export type AvailableMultiOperators = QueryOperator.IN | QueryOperator.NOT_IN;
 
 export type AvailableRangeStartOperators =
   | QueryOperator.GREATER_THAN
@@ -50,6 +52,27 @@ export type QueryBooleanType = {
   value: boolean;
 };
 
+export type QueryUnitType = {
+  key: string;
+  type: QueryType.UNIT;
+  value: {
+    quantity: {
+      min?: {
+        value: number;
+        operator: AvailableRangeStartOperators;
+      };
+      max?: {
+        value: number;
+        operator: AvailableRangeEndOperators;
+      };
+    };
+    unit: {
+      value: string;
+      operator: AvailableStringOperators;
+    };
+  };
+};
+
 export type QueryNullType = {
   key: string;
   type: undefined;
@@ -62,7 +85,8 @@ export type QueryValue =
   | QueryMultiStringType
   | QueryRangeType
   | QueryBooleanType
-  | QueryNullType;
+  | QueryNullType
+  | QueryUnitType;
 
 export type SearchParams = {
   [key: string]: string | string[] | undefined;

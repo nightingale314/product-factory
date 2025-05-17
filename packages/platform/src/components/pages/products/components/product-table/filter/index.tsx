@@ -1,6 +1,10 @@
 import { TableFilter } from "@/components/composition/table/filter";
-import { FilterNodeType } from "@/components/composition/table/filter/types";
+import {
+  FilterNodeOptions,
+  FilterNodeType,
+} from "@/components/composition/table/filter/types";
 import { Badge } from "@/components/ui/badge";
+import { MAX_PRODUCT_TABLE_FILTERS } from "@/constants/common";
 import { QueryType } from "@/lib/parsers/enums";
 import { QueryValue } from "@/lib/parsers/types";
 import { Attribute } from "@prisma/client";
@@ -11,13 +15,13 @@ const mapAttributeToQueryType = (attribute: Attribute) => {
     case "SHORT_TEXT":
       return QueryType.STRING;
     case "LONG_TEXT":
-      return null;
+      return QueryType.STRING;
     case "NUMBER":
       return QueryType.RANGE;
     case "BOOLEAN":
       return QueryType.BOOLEAN;
     case "DATE":
-      return QueryType.DATE;
+      return null;
     case "SINGLE_SELECT":
       return QueryType.STRING;
     case "MULTI_SELECT":
@@ -46,13 +50,24 @@ const fixedFilters: FilterNodeType[] = [
   },
 ];
 
-const getFilterNodeOptions = (attribute: Attribute) => {
+const getFilterNodeOptions = (
+  attribute: Attribute
+): FilterNodeOptions | undefined => {
   switch (attribute.type) {
+    case "SINGLE_SELECT":
     case "MULTI_SELECT":
       return {
         selectOptions: attribute?.selectOptions.map((option) => ({
           label: option,
           value: option,
+        })),
+      };
+
+    case "MEASURE":
+      return {
+        unitOptions: attribute?.measureUnits.map((unit) => ({
+          label: unit,
+          value: unit,
         })),
       };
     default:
@@ -90,6 +105,7 @@ export const ProductTableFilter = ({
         filterValues={filterValues}
         availableFilterNodes={availableFilterNodes}
         onFilterChange={onFilterChange}
+        maxFilters={MAX_PRODUCT_TABLE_FILTERS}
       />
     </div>
   );

@@ -17,8 +17,6 @@ const ChipDisplayLabel = ({
   type: QueryType;
   value?: QueryValue["value"];
 }) => {
-  console.log(type, value);
-
   switch (type) {
     case QueryType.STRING:
       return `${value}`;
