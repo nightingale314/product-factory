@@ -46,6 +46,19 @@ const fixedFilters: FilterNodeType[] = [
   },
 ];
 
+const getFilterNodeOptions = (attribute: Attribute) => {
+  switch (attribute.type) {
+    case "MULTI_SELECT":
+      return {
+        selectOptions: attribute?.selectOptions.map((option) => ({
+          label: option,
+          value: option,
+        })),
+      };
+    default:
+      return undefined;
+  }
+};
 export const ProductTableFilter = ({
   filterValues,
   supplierAttributes,
@@ -64,6 +77,7 @@ export const ProductTableFilter = ({
           label: attribute.name,
           type: mapAttributeToQueryType(attribute),
           infoBadge: <Badge variant="secondary">{attribute.type}</Badge>,
+          options: getFilterNodeOptions(attribute),
         }))
         .filter((f) => f.type !== null) as FilterNodeType[]),
     ],

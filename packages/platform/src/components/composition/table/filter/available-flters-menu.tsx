@@ -44,6 +44,7 @@ export const AvailableFiltersMenu = ({
     return (
       <FilterNode
         id={inViewFilterNode.key}
+        options={inViewFilterNode.options}
         renderLabel={(node) => (
           <div className="flex items-center gap-2">
             <Button

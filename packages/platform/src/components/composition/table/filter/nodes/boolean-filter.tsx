@@ -1,7 +1,7 @@
 import { QueryOperator } from "@/lib/parsers/enums";
 import { FilterInput } from "../types";
 import { QueryType } from "@/lib/parsers/enums";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   SelectItem,
   SelectTrigger,
@@ -24,10 +24,6 @@ export const BooleanFilter = ({
 }: BooleanFilterProps) => {
   const [inputValue, setInputValue] = useState<boolean | undefined>(value);
 
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
-
   const onApplyClick = () => {
     if (inputValue === undefined) {
       return;
@@ -49,7 +45,7 @@ export const BooleanFilter = ({
       renderLabel={renderLabel}
     >
       <Select
-        value={inputValue !== undefined ? `${inputValue}` : undefined}
+        defaultValue={value !== undefined ? `${value}` : undefined}
         onValueChange={(value) => setInputValue(value === "true")}
       >
         <SelectTrigger>

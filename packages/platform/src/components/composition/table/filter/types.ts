@@ -14,4 +14,10 @@ export type FilterNodeType = {
   label: string;
   fixed?: boolean;
   infoBadge?: React.ReactNode;
+  options?: {
+    selectOptions?: {
+      label: string;
+      value: string;
+    }[];
+  };
 };

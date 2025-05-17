@@ -67,12 +67,14 @@ export const TableFilter = ({
         nodeList={fixedFilters.filter(
           (f) => !(hiddenKeys ?? []).includes(f.key)
         )}
+        availableFilterNodes={availableFilterNodes}
         filterValues={values}
         onRemove={handleRemoveFilter}
         onApply={handleApplyFilter}
       />
       <FilterList
         nodeList={dynamicFilterList}
+        availableFilterNodes={availableFilterNodes}
         filterValues={values}
         onRemove={handleRemoveFilter}
         onApply={handleApplyFilter}
