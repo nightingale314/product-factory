@@ -20,6 +20,7 @@ export const editAttributeSchema = z.object({
       message: "Options must be unique",
     })
     .optional(),
+  primaryMedia: z.boolean().optional(),
 });
 
 export type EditAttributeSchema = z.infer<typeof editAttributeSchema>;

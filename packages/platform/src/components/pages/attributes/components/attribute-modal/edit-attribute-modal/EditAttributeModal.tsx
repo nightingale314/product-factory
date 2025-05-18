@@ -45,6 +45,7 @@ export function EditAttributeModal({
       enrichmentEnabled: initialAttribute?.enrichmentEnabled || false,
       selectOptions: initialAttribute?.selectOptions || [],
       measureUnits: initialAttribute?.measureUnits || [],
+      primaryMedia: initialAttribute?.primaryMedia || false,
     },
   });
 

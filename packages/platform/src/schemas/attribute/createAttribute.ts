@@ -23,6 +23,7 @@ export const createAttributeSchema = z
         message: "Options must be unique",
       })
       .optional(),
+    primaryMedia: z.boolean().optional(),
   })
   .refine(
     (data) => {

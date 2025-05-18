@@ -55,6 +55,9 @@ export function CreateAttributeFormItems() {
     if (attributeType === AttributeType.MEDIA) {
       setValue("enrichmentEnabled", false);
     }
+    if (attributeType !== AttributeType.MEDIA) {
+      unregister("primaryMedia");
+    }
   }, [attributeType]);
 
   return (
@@ -155,6 +158,28 @@ export function CreateAttributeFormItems() {
                 onChange={(options) => {
                   field.onChange(options);
                 }}
+              />
+            </FormField>
+          )}
+        />
+      )}
+
+      {attributeType === AttributeType.MEDIA && (
+        <Controller
+          name="primaryMedia"
+          control={control}
+          render={({ field }) => (
+            <FormField
+              name="primaryMedia"
+              errors={errors}
+              label="Primary Media"
+              vertical={false}
+              description="If enabled, this attribute will be used as the primary media for the product."
+            >
+              <Switch
+                {...field}
+                checked={field.value}
+                onCheckedChange={field.onChange}
               />
             </FormField>
           )}

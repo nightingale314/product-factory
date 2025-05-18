@@ -33,11 +33,12 @@ export const ProductDetailSheet = ({
     initialData: productData,
   });
 
-  const mediaAttribute = attributes.find(
-    (attr) => attr.type === AttributeType.MEDIA
+  // Not ideal design, should add properties of media type.
+  const primaryMediaAttribute = attributes.find(
+    (attr) => attr.type === AttributeType.MEDIA && attr?.primaryMedia
   );
   const firstMedia = product?.attributes.find(
-    (i) => i.attributeId === mediaAttribute?.id
+    (i) => i.attributeId === primaryMediaAttribute?.id
   );
 
   return (

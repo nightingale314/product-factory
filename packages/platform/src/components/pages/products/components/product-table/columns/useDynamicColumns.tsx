@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { ProductTableCell } from "../cells";
 import { ColumnDef } from "@tanstack/react-table";
 import { ProductWithAttributes } from "@/types/product";
-import { useDefaultColumns } from "./DefaultColumns";
+import { useDefaultColumns } from "./useDefaultColumns";
 
 const getColumnSize = (attr: Attribute) => {
   switch (attr.type) {

@@ -138,6 +138,28 @@ export function EditAttributeFormItems() {
         />
       )}
 
+      {attributeType === AttributeType.MEDIA && (
+        <Controller
+          name="primaryMedia"
+          control={control}
+          render={({ field }) => (
+            <FormField
+              name="primaryMedia"
+              errors={errors}
+              label="Primary Media"
+              vertical={false}
+              description="If enabled, this attribute will be used as the primary media for the product."
+            >
+              <Switch
+                {...field}
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormField>
+          )}
+        />
+      )}
+
       <Controller
         name="required"
         control={control}

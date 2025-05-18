@@ -27,6 +27,7 @@ model Attribute {
 
   selectOptions String[]
   measureUnits String[]
+  primaryMedia Boolean?
   productAttributes ProductAttribute[]
 
   @@index([supplierId])
