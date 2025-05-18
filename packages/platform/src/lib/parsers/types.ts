@@ -2,7 +2,8 @@ import { QueryOperator, QueryType } from "./enums";
 
 export type AvailableStringOperators =
   | QueryOperator.EQUALS
-  | QueryOperator.NOT_EQUALS;
+  | QueryOperator.NOT_EQUALS
+  | QueryOperator.CONTAINS;
 
 export type AvailableMultiOperators = QueryOperator.IN | QueryOperator.NOT_IN;
 

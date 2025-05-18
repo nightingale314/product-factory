@@ -13,9 +13,14 @@ export const ProductTable = async ({ searchParams }: PageProps) => {
   const { page = DEFAULT_PAGE, pageSize = DEFAULT_PAGE_SIZE } =
     paginationParser(queryValues);
 
+  const filterValues = Array.from(queryValues.values()).filter(
+    (v) => v.key !== "page" && v.key !== "pageSize"
+  );
+
   const [products, attributes] = await Promise.all([
     await listProductLoader({
       pagination: { page, pageSize },
+      filter: filterValues,
     }),
     await listAttributeLoader({
       pagination: { page: 1, pageSize: 1000 },

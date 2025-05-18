@@ -23,13 +23,17 @@ const getOperatorEncoding = (operator: QueryOperator, key: string) => {
       return `${key}[gte]`;
     case QueryOperator.LESS_THAN_OR_EQUAL:
       return `${key}[lte]`;
+    case QueryOperator.CONTAINS:
+      return `${key}[con]`;
   }
 };
 
 const getOperatorFromQueryKey = (
   queryKey: string
 ): { key: string; operator: QueryOperator } => {
-  const match = queryKey.match(/^(.*?)(?:\[(neq|in|nin|gt|lt|gte|lte)\])?$/);
+  const match = queryKey.match(
+    /^(.*?)(?:\[(neq|in|nin|gt|lt|gte|lte|con)\])?$/
+  );
   if (!match) {
     return { key: queryKey, operator: QueryOperator.EQUALS };
   }
@@ -50,6 +54,8 @@ const getOperatorFromQueryKey = (
       return { key, operator: QueryOperator.GREATER_THAN_OR_EQUAL };
     case "lte":
       return { key, operator: QueryOperator.LESS_THAN_OR_EQUAL };
+    case "con":
+      return { key, operator: QueryOperator.CONTAINS };
     default:
       return { key, operator: QueryOperator.EQUALS };
   }
@@ -142,28 +148,26 @@ export const decodeQuery = (
       continue;
     }
 
-    // STRING / MULTI_STRING
+    // STRING / MULTI_STRING (First key of multi string is always string)
     if (
       operator === QueryOperator.EQUALS ||
-      operator === QueryOperator.NOT_EQUALS
+      operator === QueryOperator.NOT_EQUALS ||
+      operator === QueryOperator.CONTAINS
     ) {
-      const isNot = operator === QueryOperator.NOT_EQUALS;
-
       if (!map.has(key)) {
         // first time seeing it
         map.set(key, {
           key,
-          type: isNot ? QueryType.STRING : QueryType.STRING,
-          operator: isNot ? QueryOperator.NOT_EQUALS : QueryOperator.EQUALS,
+          type: QueryType.STRING,
+          operator,
           value: rawValue,
         });
       } else {
         const existing = map.get(key)!;
-        // if already multi or second plain equals => become MULTI_STRING/IN
+        // if existing key is a string, and there is > 1 of the same key, it is a multi string.
         if (
           existing.type === QueryType.STRING &&
-          existing.operator === QueryOperator.EQUALS &&
-          !isNot
+          existing.operator === QueryOperator.EQUALS
         ) {
           map.set(key, {
             key,
@@ -171,12 +175,6 @@ export const decodeQuery = (
             operator: QueryOperator.IN,
             value: [existing.value as string, rawValue],
           });
-        } else if (
-          existing.type === QueryType.MULTI_STRING &&
-          existing.operator === QueryOperator.IN &&
-          !isNot
-        ) {
-          (existing.value as string[]).push(rawValue);
         } else {
           // override for NOT_EQUALS or other mixes
           map.set(key, {
@@ -201,11 +199,13 @@ export const decodeQuery = (
         });
       } else {
         const existing = map.get(key)!;
-        if (
-          existing.type === QueryType.MULTI_STRING &&
-          existing.operator === operator
-        ) {
-          (existing.value as string[]).push(rawValue);
+        if (existing.type === QueryType.MULTI_STRING) {
+          map.set(key, {
+            key,
+            type: QueryType.MULTI_STRING,
+            operator,
+            value: [...existing.value, rawValue],
+          });
         } else {
           // override if operator changed
           map.set(key, {

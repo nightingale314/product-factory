@@ -9,10 +9,11 @@ export enum QueryType {
 }
 
 export enum QueryOperator {
-  EQUALS = "EQUALS",
-  NOT_EQUALS = "NOT_EQUALS",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
+  CONTAINS = "CONTAINS", // For substring match
+  EQUALS = "EQUALS", // For exact match
+  NOT_EQUALS = "NOT_EQUALS", // For exact match
+  IN = "IN", // For arrays
+  NOT_IN = "NOT_IN", // For arrays
   GREATER_THAN = "GREATER_THAN",
   LESS_THAN = "LESS_THAN",
   GREATER_THAN_OR_EQUAL = "GREATER_THAN_OR_EQUAL",

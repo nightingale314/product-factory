@@ -19,6 +19,7 @@ const operatorMap: Record<QueryOperator, string> = {
   [QueryOperator.LESS_THAN]: "Less than",
   [QueryOperator.GREATER_THAN_OR_EQUAL]: "More than or equal to",
   [QueryOperator.LESS_THAN_OR_EQUAL]: "Less than or equal to",
+  [QueryOperator.CONTAINS]: "Contains",
 };
 
 const FilterLabel = ({ label }: { label: React.ReactNode }) => {

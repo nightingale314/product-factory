@@ -5,7 +5,7 @@ import {
   WithPaginationSort,
 } from "./common";
 import { ImportProductsAttributeMapping } from "@product-factory/import-service/lib/generateProductsFromMappings";
-
+import { QueryValue } from "@/lib/parsers/types";
 export type ProductWithAttributes = Product & {
   attributes: ProductAttribute[];
 };
@@ -35,9 +35,7 @@ export type CancelImportTaskInput = {
 export type CancelImportTaskOutput = ServerResponse<ProductImportTask>;
 
 export interface ListProductInput extends WithPaginationSort<Product> {
-  filter?: {
-    searchString?: string;
-  };
+  filter?: QueryValue[];
 }
 
 export type ListProductOutput = ServerResponseList<ProductWithAttributes>;

@@ -4,6 +4,7 @@ import {
   FilterNodeType,
 } from "@/components/composition/table/filter/types";
 import { Badge } from "@/components/ui/badge";
+import { RESERVED_ATTRIBUTES } from "@/constants/attributes";
 import { MAX_PRODUCT_TABLE_FILTERS } from "@/constants/common";
 import { QueryType } from "@/lib/parsers/enums";
 import { QueryValue } from "@/lib/parsers/types";
@@ -37,13 +38,13 @@ const mapAttributeToQueryType = (attribute: Attribute) => {
 
 const fixedFilters: FilterNodeType[] = [
   {
-    key: "name",
+    key: RESERVED_ATTRIBUTES.PRODUCT_NAME,
     label: "Name",
     type: QueryType.STRING,
     fixed: true,
   },
   {
-    key: "skuId",
+    key: RESERVED_ATTRIBUTES.PRODUCT_SKU_ID,
     label: "SKU ID",
     type: QueryType.STRING,
     fixed: true,
