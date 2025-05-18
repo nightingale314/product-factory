@@ -2,7 +2,8 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { encodeQuery, decodeQuery, QueryValue } from "@/lib/parsers/parsers";
+import { encodeQuery, decodeQuery } from "@/lib/parsers/parsers";
+import { QueryValue } from "@/lib/parsers/types";
 
 type UseQueryParamsOptions = {
   initialQueryValues?: Map<string, QueryValue>;
@@ -41,15 +42,13 @@ export function useQueryParams({
 
       setQueryValuesState(updatedMap);
 
-      // encode back into URLSearchParams (preserving others)
       const updated = encodeQuery({
-        existingSearchParams: searchParams,
         queryValues: queryValuesToBeInserted,
       });
 
       router.replace(`${pathname}?${updated.toString()}`);
     },
-    [queryValues, router, pathname, searchParams]
+    [queryValues, router, pathname]
   );
 
   return { queryValues, setQueryValues };

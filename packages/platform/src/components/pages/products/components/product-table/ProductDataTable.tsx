@@ -9,12 +9,12 @@ import { ProductTableFilter } from "./filter";
 import { useQueryParams } from "@/hooks/use-query-state";
 import { QueryOperator } from "@/lib/parsers/enums";
 import { QueryType } from "@/lib/parsers/enums";
-import { QueryValue } from "@/lib/parsers/parsers";
+import { QueryValue } from "@/lib/parsers/types";
 import { DEFAULT_PAGE_SIZE } from "@/constants/common";
 import { DEFAULT_PAGE } from "@/constants/common";
 import { paginationParser } from "@/lib/parsers/common-parsers";
 
-interface ProductDataTableProps {
+export interface ProductDataTableProps {
   data: ProductWithAttributes[];
   supplierAttributes: Attribute[];
   total: number;
@@ -39,13 +39,23 @@ export const ProductDataTable = ({
     supplierAttributes,
   });
 
+  const onFilterChange = (updatedFilterValues: Map<string, QueryValue>) => {
+    const queryValuesArray = Array.from(updatedFilterValues.values());
+    setQueryValues(queryValuesArray);
+  };
+
   useEffect(() => {
+    console.log(data);
     setTableData(data);
   }, [data]);
 
   return (
     <>
-      <ProductTableFilter />
+      <ProductTableFilter
+        filterValues={queryValues}
+        supplierAttributes={supplierAttributes}
+        onFilterChange={onFilterChange}
+      />
       <DataTable
         columns={columns}
         data={tableData}

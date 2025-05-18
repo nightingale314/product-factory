@@ -1,58 +1,9 @@
 import { QueryOperator, QueryType } from "./enums";
-
-type AvailableStringOperators = QueryOperator.EQUALS | QueryOperator.NOT_EQUALS;
-
-type AvailableMultiOperators = QueryOperator.IN | QueryOperator.NOT_IN;
-
-export type AvailableRangeStartOperators =
-  | QueryOperator.GREATER_THAN
-  | QueryOperator.GREATER_THAN_OR_EQUAL;
-
-export type AvailableRangeEndOperators =
-  | QueryOperator.LESS_THAN
-  | QueryOperator.LESS_THAN_OR_EQUAL;
-
-type AvailableBooleanOperators = QueryOperator.EQUALS;
-
-export type QueryValue =
-  | {
-      key: string;
-      type: QueryType.STRING;
-      operator: AvailableStringOperators;
-      value: string;
-    }
-  | {
-      key: string;
-      type: QueryType.MULTI_STRING;
-      operator: AvailableMultiOperators;
-      value: string[];
-    }
-  | {
-      key: string;
-      type: QueryType.RANGE;
-      value: {
-        min?: {
-          value: number;
-          operator: AvailableRangeStartOperators;
-        };
-        max?: {
-          value: number;
-          operator: AvailableRangeEndOperators;
-        };
-      };
-    }
-  | {
-      key: string;
-      type: QueryType.BOOLEAN;
-      operator: AvailableBooleanOperators;
-      value: boolean;
-    }
-  | {
-      key: string;
-      type: undefined;
-      operator: undefined;
-      value: null;
-    };
+import {
+  AvailableRangeEndOperators,
+  AvailableRangeStartOperators,
+  QueryValue,
+} from "./types";
 
 const getOperatorEncoding = (operator: QueryOperator, key: string) => {
   switch (operator) {
@@ -72,18 +23,23 @@ const getOperatorEncoding = (operator: QueryOperator, key: string) => {
       return `${key}[gte]`;
     case QueryOperator.LESS_THAN_OR_EQUAL:
       return `${key}[lte]`;
+    case QueryOperator.CONTAINS:
+      return `${key}[con]`;
   }
 };
 
 const getOperatorFromQueryKey = (
   queryKey: string
 ): { key: string; operator: QueryOperator } => {
-  const match = queryKey.match(/^(.*?)(?:\[(neq|in|nin|gt|lt|gte|lte)\])?$/);
+  const match = queryKey.match(
+    /^(.*?)(?:\[(neq|in|nin|gt|lt|gte|lte|con)\])?$/
+  );
   if (!match) {
     return { key: queryKey, operator: QueryOperator.EQUALS };
   }
 
   const [, key, op] = match;
+
   switch (op) {
     case "neq":
       return { key, operator: QueryOperator.NOT_EQUALS };
@@ -99,6 +55,8 @@ const getOperatorFromQueryKey = (
       return { key, operator: QueryOperator.GREATER_THAN_OR_EQUAL };
     case "lte":
       return { key, operator: QueryOperator.LESS_THAN_OR_EQUAL };
+    case "con":
+      return { key, operator: QueryOperator.CONTAINS };
     default:
       return { key, operator: QueryOperator.EQUALS };
   }
@@ -191,28 +149,26 @@ export const decodeQuery = (
       continue;
     }
 
-    // STRING / MULTI_STRING
+    // STRING / MULTI_STRING (First key of multi string is always string)
     if (
       operator === QueryOperator.EQUALS ||
-      operator === QueryOperator.NOT_EQUALS
+      operator === QueryOperator.NOT_EQUALS ||
+      operator === QueryOperator.CONTAINS
     ) {
-      const isNot = operator === QueryOperator.NOT_EQUALS;
-
       if (!map.has(key)) {
         // first time seeing it
         map.set(key, {
           key,
-          type: isNot ? QueryType.STRING : QueryType.STRING,
-          operator: isNot ? QueryOperator.NOT_EQUALS : QueryOperator.EQUALS,
+          type: QueryType.STRING,
+          operator,
           value: rawValue,
         });
       } else {
         const existing = map.get(key)!;
-        // if already multi or second plain equals => become MULTI_STRING/IN
+        // if existing key is a string, and there is > 1 of the same key, it is a multi string.
         if (
           existing.type === QueryType.STRING &&
-          existing.operator === QueryOperator.EQUALS &&
-          !isNot
+          existing.operator === QueryOperator.EQUALS
         ) {
           map.set(key, {
             key,
@@ -220,12 +176,6 @@ export const decodeQuery = (
             operator: QueryOperator.IN,
             value: [existing.value as string, rawValue],
           });
-        } else if (
-          existing.type === QueryType.MULTI_STRING &&
-          existing.operator === QueryOperator.IN &&
-          !isNot
-        ) {
-          (existing.value as string[]).push(rawValue);
         } else {
           // override for NOT_EQUALS or other mixes
           map.set(key, {
@@ -250,11 +200,13 @@ export const decodeQuery = (
         });
       } else {
         const existing = map.get(key)!;
-        if (
-          existing.type === QueryType.MULTI_STRING &&
-          existing.operator === operator
-        ) {
-          (existing.value as string[]).push(rawValue);
+        if (existing.type === QueryType.MULTI_STRING) {
+          map.set(key, {
+            key,
+            type: QueryType.MULTI_STRING,
+            operator,
+            value: [...existing.value, rawValue],
+          });
         } else {
           // override if operator changed
           map.set(key, {
@@ -285,23 +237,30 @@ export const decodeQuery = (
         operator === QueryOperator.GREATER_THAN_OR_EQUAL;
       const side: "min" | "max" = isStart ? "min" : "max";
 
-      if (!map.has(key) || map.get(key)!.type !== QueryType.RANGE) {
+      if (map.has(key)) {
+        const existing = map.get(key)!;
+        if (existing.type === QueryType.RANGE) {
+          map.set(key, {
+            ...existing,
+            value: {
+              ...existing.value,
+              [side]: { value: num, operator },
+            },
+          });
+        }
+      } else {
         map.set(key, {
           key,
           type: QueryType.RANGE,
           value: {
             [side]: { value: num, operator } as {
               value: number;
-              operator: AvailableRangeStartOperators;
+              operator:
+                | AvailableRangeStartOperators
+                | AvailableRangeEndOperators;
             },
           },
         });
-      } else {
-        const existing = map.get(key)!;
-        existing.value = {
-          ...((typeof existing.value === "object" && existing.value) || {}),
-          [side]: { value: num, operator },
-        };
       }
       continue;
     }
