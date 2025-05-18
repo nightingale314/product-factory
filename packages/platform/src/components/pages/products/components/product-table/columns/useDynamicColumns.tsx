@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { ProductTableCell } from "../cells";
 import { ColumnDef } from "@tanstack/react-table";
 import { ProductWithAttributes } from "@/types/product";
-import { DEFAULT_COLUMNS } from "./DefaultColumns";
+import { useDefaultColumns } from "./DefaultColumns";
 
 const getColumnSize = (attr: Attribute) => {
   switch (attr.type) {
@@ -43,10 +43,12 @@ const generateColumns = (attributes: Attribute[]) =>
 
 interface DynamicAttributeColumnProps {
   supplierAttributes: Attribute[];
+  onUpdateSuccess: (newProduct: ProductWithAttributes) => void;
 }
 
 export const useDynamicColumns = ({
   supplierAttributes,
+  onUpdateSuccess,
 }: DynamicAttributeColumnProps) => {
   const {
     value: visibleColumnKeys,
@@ -57,9 +59,14 @@ export const useDynamicColumns = ({
     initialValue: [],
   });
 
+  const { defaultColumns } = useDefaultColumns({
+    attributes: supplierAttributes,
+    onUpdateSuccess,
+  });
+
   const updateColumnVisibility = (visibleCols: string[]) => {
     const dynamicColumnIds = visibleCols.filter(
-      (colId) => !!DEFAULT_COLUMNS.find((col) => col.id === colId)
+      (colId) => !!defaultColumns.find((col) => col.id === colId)
     );
     setVisibleColumnKeys(dynamicColumnIds);
   };
@@ -73,12 +80,12 @@ export const useDynamicColumns = ({
     );
 
     const uniqueColumns = new Set([
-      ...DEFAULT_COLUMNS,
+      ...defaultColumns,
       ...generateColumns(visibleAttributes),
     ]);
 
     return Array.from([...uniqueColumns]);
-  }, [supplierAttributes, visibleColumnKeys]);
+  }, [supplierAttributes, visibleColumnKeys, defaultColumns]);
 
   return { columns, updateColumnVisibility, loading: loadingColumnCache };
 };

@@ -38,6 +38,7 @@ export async function createAttributeAction(
     const response = await prisma.attribute.create({
       data: {
         ...input,
+        enrichmentEnabled: input.enrichmentEnabled ?? false,
         supplierId,
       },
     });

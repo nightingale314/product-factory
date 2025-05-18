@@ -13,14 +13,17 @@ import { Fragment, useState } from "react";
 interface SelectAttributeConfigProps {
   className?: string;
   initialOptions?: string[];
+  appendMode?: boolean;
   onChange?: (options: string[]) => void;
 }
 
 export const SelectAttributeConfig = ({
   initialOptions,
   onChange,
+  appendMode = false,
 }: SelectAttributeConfigProps) => {
   const [options, setOptions] = useState<string[]>(initialOptions || []);
+  const [immutableIdx] = useState<number>(initialOptions?.length || 0);
   const [value, setValue] = useState<string>("");
 
   const handleAddOptions = () => {
@@ -64,7 +67,7 @@ export const SelectAttributeConfig = ({
           options.map((option, idx) => (
             <Fragment key={`${option}-${idx}`}>
               <div className="text-sm p-2 flex items-center gap-2">
-                {onChange ? (
+                {onChange && (!appendMode || idx >= immutableIdx) ? (
                   <button
                     className="text-muted-foreground"
                     onClick={() => {

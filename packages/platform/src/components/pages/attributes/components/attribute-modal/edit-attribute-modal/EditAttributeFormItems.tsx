@@ -109,6 +109,7 @@ export function EditAttributeFormItems() {
             initialOptions={
               defaultValues?.selectOptions as string[] | undefined
             }
+            appendMode
           />
         </FormField>
       )}
@@ -130,6 +131,7 @@ export function EditAttributeFormItems() {
                 onChange={(options) => {
                   field.onChange(options);
                 }}
+                appendMode
               />
             </FormField>
           )}

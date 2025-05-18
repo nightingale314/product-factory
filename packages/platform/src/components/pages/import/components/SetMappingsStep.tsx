@@ -22,7 +22,7 @@ import {
   TableBody,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, XIcon } from "lucide-react";
 import { ImportProductsAttributeMapping } from "@product-factory/import-service/lib/generateProductsFromMappings";
 import { createImportTask } from "@/server-actions/import/createImportTask";
 import { cancelImportTask } from "@/server-actions/import/cancelImportTask";
@@ -94,22 +94,28 @@ export const SetMappingsStep = () => {
       return;
     }
 
-    const isValidMapping = mappings.every(
-      (mapping) => mapping.matchedAttributeId
+    const formattedMappings = attributeMappings.filter(
+      (mapping) => !!mapping.targetAttributeId
+    );
+
+    const isValidMapping = formattedMappings.some(
+      (mapping) => mapping.targetAttributeId
     );
 
     if (!isValidMapping) {
-      toast.error("Please select a target attribute for each mapping.");
+      toast.error(
+        "Please select at least 1 target attribute for each mapping."
+      );
       return;
     }
 
-    if (!attributeMappings.find((attr) => attr.targetAttributeId === "skuId")) {
+    if (!formattedMappings.find((attr) => attr.targetAttributeId === "skuId")) {
       toast.error("Missing mapping for SKU ID");
       return;
     }
 
     if (
-      !attributeMappings.find(
+      !formattedMappings.find(
         (attr) => attr.targetAttributeId === "productName"
       )
     ) {
@@ -117,7 +123,7 @@ export const SetMappingsStep = () => {
       return;
     }
 
-    const duplicateIndices = findDuplicateTargetAttributeIds(attributeMappings);
+    const duplicateIndices = findDuplicateTargetAttributeIds(formattedMappings);
 
     if (duplicateIndices.length > 0) {
       toast.error(
@@ -133,7 +139,7 @@ export const SetMappingsStep = () => {
     const updatedTask = await createImportTask({
       taskId: task.id,
       taskType: "IMPORT",
-      selectedMappings: attributeMappings,
+      selectedMappings: formattedMappings,
     });
 
     if (updatedTask.errorCode !== ServerErrorCode.SUCCESS) {
@@ -202,6 +208,8 @@ export const SetMappingsStep = () => {
     );
   }
 
+  console.log("attributeMappings", attributeMappings);
+
   return (
     <div className="grow flex flex-col gap-4 w-full p-6">
       <Instructions
@@ -239,53 +247,88 @@ export const SetMappingsStep = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {mappings.map((mapping) => (
-            <TableRow key={mapping.columnIndex} className="border-b px-4 py-2">
-              <TableCell>{mapping.columnIndex}</TableCell>
-              <TableCell className="text-right">{mapping.row}</TableCell>
-              <TableCell>
-                <Select
-                  value={
-                    attributeMappings.find(
-                      (attr) => attr.columnIndex === mapping.columnIndex
-                    )?.targetAttributeId
-                  }
-                  onValueChange={(value) => {
-                    setAttributeMappings(
-                      attributeMappings.map((attr) => {
-                        if (attr.columnIndex === mapping.columnIndex) {
-                          return { ...attr, targetAttributeId: value };
-                        }
-                        return attr;
-                      })
-                    );
-                  }}
-                >
-                  <SelectTrigger className="min-w-0">
-                    <SelectValue placeholder="Select target attribute" />
-                  </SelectTrigger>
-                  <SelectContent side="bottom">
-                    {[...RESERVED_ATTRIBUTEs, ...attributes].map((attr) => {
-                      const score =
-                        attr.id === mapping.matchedAttributeId
-                          ? mapping.score
-                          : null;
-                      return (
-                        <SelectItem key={attr.id} value={`${attr.id}`}>
-                          {attr.name}
-                          {score !== null && (
-                            <span className={cn(getScoreColor(score))}>
-                              Confidence: {score.toFixed(2)}
-                            </span>
-                          )}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </TableCell>
-            </TableRow>
-          ))}
+          {mappings.map((mapping) => {
+            const val = attributeMappings.find(
+              (attr) => attr.columnIndex === mapping.columnIndex
+            )?.targetAttributeId;
+
+            console.log(mapping.columnIndex, val);
+            return (
+              <TableRow
+                key={mapping.columnIndex}
+                className="border-b px-4 py-2"
+              >
+                <TableCell>{mapping.columnIndex}</TableCell>
+                <TableCell className="text-right">{mapping.row}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={val ?? ""}
+                      onValueChange={(value) => {
+                        setAttributeMappings((curr) =>
+                          curr.map((attr) => {
+                            if (attr.columnIndex === mapping.columnIndex) {
+                              console.log("change", attr, mapping, {
+                                ...attr,
+                                targetAttributeId: value,
+                              });
+                              return { ...attr, targetAttributeId: value };
+                            }
+                            return attr;
+                          })
+                        );
+                      }}
+                    >
+                      <SelectTrigger className="min-w-0">
+                        <SelectValue placeholder="Select target attribute" />
+                      </SelectTrigger>
+                      <SelectContent side="bottom">
+                        {[...RESERVED_ATTRIBUTEs, ...attributes].map((attr) => {
+                          const score =
+                            attr.id === mapping.matchedAttributeId
+                              ? mapping.score
+                              : null;
+                          return (
+                            <SelectItem key={attr.id} value={`${attr.id}`}>
+                              {attr.name}
+                              {score !== null && (
+                                <span className={cn(getScoreColor(score))}>
+                                  Confidence: {score.toFixed(2)}
+                                </span>
+                              )}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    {val && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (val) {
+                            setAttributeMappings((attr) =>
+                              attr.map((a) => {
+                                if (a.columnIndex === mapping.columnIndex) {
+                                  return {
+                                    ...a,
+                                    targetAttributeId: "",
+                                  };
+                                }
+                                return a;
+                              })
+                            );
+                          }
+                        }}
+                      >
+                        <XIcon className="size-4" color="gray" />
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

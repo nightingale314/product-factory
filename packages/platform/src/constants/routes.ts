@@ -15,4 +15,5 @@ export const routes = {
 export const apiRoutes = {
   attributes: "/api/attributes",
   import: "/api/import",
+  product: "/api/product",
 };

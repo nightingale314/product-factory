@@ -39,3 +39,18 @@ export interface ListProductInput extends WithPaginationSort<Product> {
 }
 
 export type ListProductOutput = ServerResponseList<ProductWithAttributes>;
+
+export interface GetProductInput {
+  skuId: string;
+}
+
+export type GetProductOutput = ServerResponse<ProductWithAttributes>;
+
+export type UpdateProductInput = {
+  id: string;
+  skuId: string;
+  name: string;
+  attributes?: ProductAttribute[];
+};
+
+export type UpdateProductOutput = ServerResponse<ProductWithAttributes>;

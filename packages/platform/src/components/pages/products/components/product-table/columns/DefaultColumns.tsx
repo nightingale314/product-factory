@@ -1,49 +1,63 @@
 import { DateTimeCell } from "@/components/composition/table/cells/datetime";
-import { Button } from "@/components/ui/button";
-import { routes } from "@/constants/routes";
 import { ProductWithAttributes } from "@/types/product";
 import { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
 import { TextCell } from "../cells/TextCell";
+import { ProductDetailSheet } from "../../product-detail/ProductDetailSheet";
+import { Attribute } from "@prisma/client";
+import { useMemo } from "react";
 
-export const DEFAULT_COLUMNS: ColumnDef<ProductWithAttributes>[] = [
-  {
-    id: "skuId",
-    accessorKey: "skuId",
-    header: "SKU ID",
-    cell: ({ row }) => {
-      return (
-        <Link href={routes.products.detail(row.original.id)}>
-          <Button variant="link" className="!p-0">
-            {row.original.skuId}
-          </Button>
-        </Link>
-      );
-    },
-  },
-  {
-    id: "name",
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => {
-      return <TextCell value={row.original.name} attribute={null} />;
-    },
-  },
-  {
-    id: "createdAt",
-    accessorKey: "createdAt",
-    header: "Created At",
+export const useDefaultColumns = ({
+  attributes,
+  onUpdateSuccess,
+}: {
+  attributes: Attribute[];
+  onUpdateSuccess?: (newProduct: ProductWithAttributes) => void;
+}) => {
+  const defaultColumns: ColumnDef<ProductWithAttributes>[] = useMemo(
+    () => [
+      {
+        id: "skuId",
+        accessorKey: "skuId",
+        header: "SKU ID",
+        cell: ({ row }) => {
+          return (
+            <ProductDetailSheet
+              skuId={row.original.skuId}
+              productData={row.original}
+              attributes={attributes}
+              onUpdateSuccess={onUpdateSuccess}
+            />
+          );
+        },
+      },
+      {
+        id: "name",
+        accessorKey: "name",
+        header: "Name",
+        cell: ({ row }) => {
+          return <TextCell value={row.original.name} attribute={null} />;
+        },
+      },
+      {
+        id: "createdAt",
+        accessorKey: "createdAt",
+        header: "Created At",
 
-    cell: ({ row }) => {
-      return <DateTimeCell value={row.original.createdAt} />;
-    },
-  },
-  {
-    id: "updatedAt",
-    accessorKey: "updatedAt",
-    header: "Updated At",
-    cell: ({ row }) => {
-      return <DateTimeCell value={row.original.updatedAt} />;
-    },
-  },
-];
+        cell: ({ row }) => {
+          return <DateTimeCell value={row.original.createdAt} />;
+        },
+      },
+      {
+        id: "updatedAt",
+        accessorKey: "updatedAt",
+        header: "Updated At",
+        cell: ({ row }) => {
+          return <DateTimeCell value={row.original.updatedAt} />;
+        },
+      },
+    ],
+    [attributes, onUpdateSuccess]
+  );
+
+  return { defaultColumns };
+};
