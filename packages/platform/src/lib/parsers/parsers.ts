@@ -39,6 +39,7 @@ const getOperatorFromQueryKey = (
   }
 
   const [, key, op] = match;
+
   switch (op) {
     case "neq":
       return { key, operator: QueryOperator.NOT_EQUALS };
@@ -246,20 +247,20 @@ export const decodeQuery = (
               [side]: { value: num, operator },
             },
           });
-        } else {
-          map.set(key, {
-            key,
-            type: QueryType.RANGE,
-            value: {
-              [side]: { value: num, operator } as {
-                value: number;
-                operator:
-                  | AvailableRangeStartOperators
-                  | AvailableRangeEndOperators;
-              },
-            },
-          });
         }
+      } else {
+        map.set(key, {
+          key,
+          type: QueryType.RANGE,
+          value: {
+            [side]: { value: num, operator } as {
+              value: number;
+              operator:
+                | AvailableRangeStartOperators
+                | AvailableRangeEndOperators;
+            },
+          },
+        });
       }
       continue;
     }

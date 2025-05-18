@@ -59,7 +59,6 @@ const convertQueryTypeToPrismaFilterType = (
 
     case QueryType.RANGE: {
       const compoundFilter: Prisma.ProductAttributeWhereInput["value"] = {};
-
       if (value.value.min?.operator === QueryOperator.GREATER_THAN_OR_EQUAL) {
         compoundFilter.gte = value.value.min?.value;
       } else {

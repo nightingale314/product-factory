@@ -14,7 +14,7 @@ import { DEFAULT_PAGE_SIZE } from "@/constants/common";
 import { DEFAULT_PAGE } from "@/constants/common";
 import { paginationParser } from "@/lib/parsers/common-parsers";
 
-interface ProductDataTableProps {
+export interface ProductDataTableProps {
   data: ProductWithAttributes[];
   supplierAttributes: Attribute[];
   total: number;
@@ -45,6 +45,7 @@ export const ProductDataTable = ({
   };
 
   useEffect(() => {
+    console.log(data);
     setTableData(data);
   }, [data]);
 

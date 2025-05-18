@@ -3,9 +3,9 @@ import { loadQueryValues } from "@/lib/parsers/helpers";
 import { DEFAULT_PAGE_SIZE } from "@/constants/common";
 import { DEFAULT_PAGE } from "@/constants/common";
 import { paginationParser } from "@/lib/parsers/common-parsers";
-import { ProductDataTable } from "./ProductDataTable";
 import { listProductLoader } from "@/server-loader/products/listProductLoader";
 import { listAttributeLoader } from "@/server-loader/attributes/listAttributeLoader";
+import { ClientProductDataTable } from "./ClientProductDataTable";
 
 export const ProductTable = async ({ searchParams }: PageProps) => {
   const queryValues = await loadQueryValues(searchParams);
@@ -29,7 +29,7 @@ export const ProductTable = async ({ searchParams }: PageProps) => {
 
   return (
     <div className="container mx-auto">
-      <ProductDataTable
+      <ClientProductDataTable
         data={products?.data?.result ?? []}
         total={products?.data?.total ?? 0}
         supplierAttributes={attributes?.data?.result ?? []}
