@@ -1,6 +1,8 @@
 import {
   attributeLongTextSchema,
+  attributeMeasureSchema,
   attributeMultiSelectSchema,
+  attributeNumberSchema,
   attributeShortTextSchema,
 } from "@/schemas/product/productAttribute";
 import { AttributeType } from "@prisma/client";
@@ -62,6 +64,22 @@ export const useValidator = ({ type, required }: UseValidatorProps) => {
 
       case AttributeType.MULTI_SELECT: {
         const result = attributeMultiSelectSchema.safeParse(value);
+
+        return {
+          data: result.data as T,
+          error: result.error?.errors?.[0]?.message,
+        };
+      }
+      case AttributeType.NUMBER: {
+        const result = attributeNumberSchema.safeParse(Number(value));
+
+        return {
+          data: result.data as T,
+          error: result.error?.errors?.[0]?.message,
+        };
+      }
+      case AttributeType.MEASURE: {
+        const result = attributeMeasureSchema.safeParse(value);
 
         return {
           data: result.data as T,

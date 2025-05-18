@@ -52,6 +52,8 @@ export const ProductDataTable = ({
     setQueryValues(queryValuesArray);
   };
 
+  console.log({ data });
+
   useEffect(() => {
     setTableData(data);
   }, [data]);

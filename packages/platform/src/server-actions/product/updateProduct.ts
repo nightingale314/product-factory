@@ -2,7 +2,7 @@
 
 import { getAuthSession } from "@/lib/auth/getAuthSession";
 import { ServerErrorCode } from "@/enums/common";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { UpdateProductInput, UpdateProductOutput } from "@/types/product";
 import { serverLogger } from "@/lib/logger/serverLogger";
 import { InputJsonValue } from "@prisma/client/runtime/library";
@@ -16,36 +16,33 @@ export const updateProduct = async (
   try {
     const { user } = session;
 
-    const attributeUpdateInput:
-      | Prisma.ProductAttributeUpdateManyWithoutProductNestedInput
-      | undefined =
-      input.attributes && input.attributes.length > 0
-        ? {
-            upsert: input.attributes.map((attr) => ({
-              where: {
-                id: attr.id,
-                attributeId: attr.attributeId,
-              },
-              update: {
-                value: attr.value as Prisma.JsonNullValueInput | InputJsonValue,
-              },
-              create: {
-                attributeId: attr.id,
-                value: attr.value as Prisma.JsonNullValueInput | InputJsonValue,
-              },
-            })),
-          }
-        : undefined;
-
     const updatedProduct = await prisma.product.update({
       where: {
         id: input.id,
         supplierId: user.supplierId,
       },
       data: {
-        skuId: input.skuId,
         name: input.name,
-        attributes: attributeUpdateInput,
+        skuId: input.skuId,
+        attributes: input.attribute
+          ? {
+              upsert: {
+                where: {
+                  productId_attributeId: {
+                    productId: input.id,
+                    attributeId: input.attribute.attributeId,
+                  },
+                },
+                create: {
+                  attributeId: input.attribute.attributeId,
+                  value: input.attribute.value as InputJsonValue,
+                },
+                update: {
+                  value: input.attribute.value as InputJsonValue,
+                },
+              },
+            }
+          : undefined,
       },
       include: {
         attributes: true,

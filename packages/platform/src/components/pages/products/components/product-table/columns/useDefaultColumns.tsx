@@ -38,6 +38,15 @@ export const useDefaultColumns = ({
           return <TextCell value={row.original.name} attribute={null} />;
         },
       },
+
+      {
+        id: "updatedAt",
+        accessorKey: "updatedAt",
+        header: "Updated At",
+        cell: ({ row }) => {
+          return <DateTimeCell value={row.original.updatedAt} />;
+        },
+      },
       {
         id: "createdAt",
         accessorKey: "createdAt",
@@ -45,14 +54,6 @@ export const useDefaultColumns = ({
 
         cell: ({ row }) => {
           return <DateTimeCell value={row.original.createdAt} />;
-        },
-      },
-      {
-        id: "updatedAt",
-        accessorKey: "updatedAt",
-        header: "Updated At",
-        cell: ({ row }) => {
-          return <DateTimeCell value={row.original.updatedAt} />;
         },
       },
     ],

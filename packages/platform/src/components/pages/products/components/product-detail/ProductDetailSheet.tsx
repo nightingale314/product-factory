@@ -41,6 +41,8 @@ export const ProductDetailSheet = ({
     (i) => i.attributeId === primaryMediaAttribute?.id
   );
 
+  console.log(attributes);
+
   return (
     <div>
       <Sheet

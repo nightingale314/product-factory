@@ -25,6 +25,7 @@ model ProductAttribute {
   attribute Attribute @relation(fields: [attributeId], references: [id])
   value Json
 
+  @@unique([productId, attributeId])
   @@index([productId, attributeId])
   @@index([value], type: Gin)
   @@map("product_attribute")

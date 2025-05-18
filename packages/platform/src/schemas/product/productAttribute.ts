@@ -14,3 +14,12 @@ export const attributeNumberSchema = z.number().min(0, {
 export const attributeBooleanSchema = z.boolean();
 
 export const attributeMultiSelectSchema = z.array(z.string());
+
+export const attributeMeasureSchema = z.object({
+  value: z.number().min(0, {
+    message: "Number must be greater than 0",
+  }),
+  unit: z.string().min(1, {
+    message: "Unit is required",
+  }),
+});

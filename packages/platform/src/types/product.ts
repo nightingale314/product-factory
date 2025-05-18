@@ -50,7 +50,9 @@ export type UpdateProductInput = {
   id: string;
   skuId: string;
   name: string;
-  attributes?: ProductAttribute[];
+  attribute?: Omit<ProductAttribute, "id"> & {
+    id?: string;
+  };
 };
 
 export type UpdateProductOutput = ServerResponse<ProductWithAttributes>;

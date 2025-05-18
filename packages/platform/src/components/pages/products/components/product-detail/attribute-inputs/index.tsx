@@ -1,6 +1,6 @@
 "use client";
 
-import { Attribute, AttributeType } from "@prisma/client";
+import { Attribute, AttributeType, ProductAttribute } from "@prisma/client";
 import { TextInput } from "./Text";
 import { toast } from "sonner";
 import { MultiSelectInput } from "./MultiSelect";
@@ -11,7 +11,8 @@ import { Dispatch } from "react";
 import { JsonValue } from "@prisma/client/runtime/library";
 import { updateProduct as updateProductAction } from "@/server-actions/product/updateProduct";
 import { ServerErrorCode } from "@/enums/common";
-
+import { NumberInput } from "./Number";
+import { MeasureInput } from "./Measure";
 interface AttributeInputsProps {
   attribute: Attribute;
   value?: unknown;
@@ -30,18 +31,19 @@ export const AttributeInputs = ({
   const updateProduct = async (id: string, value: unknown) => {
     if (!product) return false;
 
-    const newProduct = {
-      ...product,
-      attributes: product.attributes.map((attr) =>
-        attr.attributeId === id ? { ...attr, value: value as JsonValue } : attr
-      ),
+    const attributeToUpdate: Omit<ProductAttribute, "id"> & {
+      id?: string;
+    } = {
+      attributeId: id,
+      value: value as JsonValue,
+      productId: product.id,
     };
 
     const updatedProductResponse = await updateProductAction({
       id: product.id,
       skuId: product.skuId,
       name: product.name,
-      attributes: newProduct.attributes,
+      attribute: attributeToUpdate,
     });
 
     if (
@@ -98,6 +100,28 @@ export const AttributeInputs = ({
             label: option,
             value: option,
           }))}
+        />
+      );
+    case AttributeType.NUMBER:
+      return (
+        <NumberInput
+          type={attribute.type}
+          value={value}
+          id={attribute.id}
+          name={attribute.name}
+          onChange={updateProduct}
+        />
+      );
+
+    case AttributeType.MEASURE:
+      return (
+        <MeasureInput
+          type={attribute.type}
+          value={value}
+          id={attribute.id}
+          name={attribute.name}
+          unitOptions={attribute.measureUnits}
+          onChange={updateProduct}
         />
       );
     default:
