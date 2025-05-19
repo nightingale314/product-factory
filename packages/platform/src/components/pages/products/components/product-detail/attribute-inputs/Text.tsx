@@ -54,7 +54,7 @@ export const TextInput = ({
     return (
       <InputWrapper id={id} name={name} required={required}>
         <Textarea
-          name={id}
+          id={id}
           value={displayValue}
           onChange={(e) => setDisplayValue(e.target.value)}
           onBlur={onSubmit}
@@ -66,7 +66,7 @@ export const TextInput = ({
   return (
     <InputWrapper id={id} name={name} required={required}>
       <Input
-        name={id}
+        id={id}
         value={displayValue}
         onChange={(e) => setDisplayValue(e.target.value)}
         onBlur={onSubmit}

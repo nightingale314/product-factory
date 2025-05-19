@@ -68,6 +68,7 @@ export const DropdownInput = ({
   return (
     <InputWrapper id={id} name={name} required={required}>
       <Select
+        name={id}
         value={displayValue}
         onValueChange={(value) => setDisplayValue(value)}
       >

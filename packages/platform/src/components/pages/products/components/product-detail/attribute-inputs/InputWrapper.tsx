@@ -1,5 +1,3 @@
-import { Label } from "@/components/ui/label";
-
 interface InputWrapperProps {
   id: string;
   name: string;
@@ -15,11 +13,12 @@ export const InputWrapper = ({
 }: InputWrapperProps) => {
   return (
     <div className="grid grid-cols-[minmax(0,200px)_1fr] w-full">
-      <Label className="items-start pt-2" htmlFor={id}>
-        <span className="truncate max-w-[200px]">
-          {name} {required ? <span className="text-red-500">*</span> : null}
-        </span>
-      </Label>
+      <label
+        className="text-sm items-start pt-2 text-muted-foreground"
+        htmlFor={id}
+      >
+        {name} {required ? <span className="text-red-500">*</span> : null}
+      </label>
       <div className="flex">{children}</div>
     </div>
   );

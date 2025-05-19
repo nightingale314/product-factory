@@ -53,7 +53,7 @@ export const NumberInput = ({
     <InputWrapper id={id} name={name} required={required}>
       <Input
         type="number"
-        name={id}
+        id={id}
         value={displayValue}
         onChange={(e) => {
           setDisplayValue(e.target.value);

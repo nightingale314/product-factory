@@ -14,6 +14,7 @@ import { Attribute, AttributeType } from "@prisma/client";
 import { AttributeInputs } from "./attribute-inputs";
 import { FixedAttributes } from "./FixedAttributes";
 import { MediaCell } from "@/components/composition/table/cells/media";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductDetailSheetProps {
   skuId: string;
@@ -41,8 +42,6 @@ export const ProductDetailSheet = ({
     (i) => i.attributeId === primaryMediaAttribute?.id
   );
 
-  console.log(attributes);
-
   return (
     <div>
       <Sheet
@@ -59,7 +58,7 @@ export const ProductDetailSheet = ({
         </SheetTrigger>
         <SheetContent
           backgroundOpacity={0.2}
-          className="!max-w-[50%]"
+          className="!w-[50%] !max-w-3xl overflow-y-auto"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <SheetHeader>
@@ -67,10 +66,13 @@ export const ProductDetailSheet = ({
               <div className="flex items-center gap-2">
                 <MediaCell
                   urls={(firstMedia?.value ?? []) as string[]}
-                  className="w-12 h-12"
+                  className="w-16 h-16"
                 />
                 <div>
                   <h1>{productData.name}</h1>
+                  <Badge variant="outline" className="text-xs font-medium">
+                    Product ID: {productData.id}
+                  </Badge>
                 </div>
               </div>
             </SheetTitle>
@@ -78,12 +80,12 @@ export const ProductDetailSheet = ({
               Changes are saved automatically
             </p>
             <div className="flex flex-col gap-2 py-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-4">
                 <h4>Details</h4>
                 <FixedAttributes product={product} />
               </div>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-4">
               <h4>Attributes</h4>
               {attributes.map((attribute) => (
                 <AttributeInputs

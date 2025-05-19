@@ -13,6 +13,7 @@ import { updateProduct as updateProductAction } from "@/server-actions/product/u
 import { ServerErrorCode } from "@/enums/common";
 import { NumberInput } from "./Number";
 import { MeasureInput } from "./Measure";
+import { RichText } from "./RichText";
 interface AttributeInputsProps {
   attribute: Attribute;
   value?: unknown;
@@ -121,6 +122,16 @@ export const AttributeInputs = ({
           id={attribute.id}
           name={attribute.name}
           unitOptions={attribute.measureUnits}
+          onChange={updateProduct}
+        />
+      );
+
+    case AttributeType.HTML:
+      return (
+        <RichText
+          id={attribute.id}
+          name={attribute.name}
+          value={value as string}
           onChange={updateProduct}
         />
       );

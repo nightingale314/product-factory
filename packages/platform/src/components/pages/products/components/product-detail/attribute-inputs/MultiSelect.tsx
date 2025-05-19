@@ -64,6 +64,7 @@ export const MultiSelectInput = ({
   return (
     <InputWrapper id={id} name={name} required={required}>
       <MultiAsyncSelect
+        id={id}
         disabled={loading}
         value={displayValue}
         placeholder="Select a value"

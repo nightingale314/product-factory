@@ -125,7 +125,7 @@ export const MeasureInput = ({
       <div className="flex items-center gap-2">
         <Input
           type="number"
-          name={id}
+          id={id}
           value={displayValue.value}
           onChange={(e) => {
             setDisplayValue({ ...displayValue, value: e.target.value });

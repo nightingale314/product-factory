@@ -38,7 +38,6 @@ export const ProductDataTable = ({
   const { columns } = useDynamicColumns({
     supplierAttributes,
     onUpdateSuccess: (newProduct: ProductWithAttributes) => {
-      console.log(newProduct);
       setTableData((prev) =>
         prev.map((product) =>
           product.id === newProduct.id ? newProduct : product
