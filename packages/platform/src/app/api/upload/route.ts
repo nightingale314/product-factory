@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
       Key: key,
       Body: body,
       ContentType: file.type, // Preserve file mime type
+      ACL: "public-read",
     });
 
     await s3.send(command);

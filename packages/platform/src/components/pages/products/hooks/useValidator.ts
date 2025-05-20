@@ -1,4 +1,5 @@
 import {
+  attributeBooleanSchema,
   attributeLongTextSchema,
   attributeMeasureSchema,
   attributeMultiSelectSchema,
@@ -80,6 +81,15 @@ export const useValidator = ({ type, required }: UseValidatorProps) => {
       }
       case AttributeType.MEASURE: {
         const result = attributeMeasureSchema.safeParse(value);
+
+        return {
+          data: result.data as T,
+          error: result.error?.errors?.[0]?.message,
+        };
+      }
+
+      case AttributeType.BOOLEAN: {
+        const result = attributeBooleanSchema.safeParse(value);
 
         return {
           data: result.data as T,

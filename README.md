@@ -2,7 +2,16 @@
 
 Fullstack app built with Next 15, Prisma, Postgres (NeonTech). Will use React 18 implementation as I am not familiar with React 19.
 
-## Architecture notes
+## Incomplete features
+
+1. Product detail page does not support datetime attributes. (Lack of time)
+2. Partial validation for product attribute values update. (Lack of time)
+3. Product table sort not completed. (Lack of time)
+4. Product table partially completed. Only Range, String, Boolean filters are working. Complex task to build the serialiser + deserialiser for the filter parser. (Lack of time)
+
+## Architecture
+
+### Notes
 
 1. This proejct uses NextJS as the fullstack framework, alongside with AWS serverless services for long live tasks (Import service + Enrichment service). All components are in a monorepo setup. Due to lack of time, deployment for the BE services are done locally instead of in a pipeline. serverless framework is used for orchestrating the services via IaaC.
 
@@ -10,7 +19,7 @@ Fullstack app built with Next 15, Prisma, Postgres (NeonTech). Will use React 18
 
 3. Queues are used for the import and enrichment services as they are long running tasks.
 
-## Import service
+### Import service
 
 1. The select header step is done on the client as the step has high risks of cancellation. Because the CSV is processed as a stream with max row count, the performance is very fast.
 
@@ -19,7 +28,7 @@ Fullstack app built with Next 15, Prisma, Postgres (NeonTech). Will use React 18
 3. The mapping step has a suggestion step, where the worker will suggest the mapping of attributes based on the header by embedding the Supplier attributes and the CSV file headers. The embeddings are the ranked by cosine similarity. The suggested mapping is then returned along with a confidence score based on the similarity.
 4.
 
-## Enrichment service
+### Enrichment service
 
 ## NextJS architecture design
 
@@ -39,6 +48,4 @@ Fullstack app built with Next 15, Prisma, Postgres (NeonTech). Will use React 18
 
 ## Bug list
 
-1. Filter encoders and decoders are not fully working due to lack of time in designing the parsers. This is by far one of the hardest Frontend task - to create dynamic filter operators of various filter types, with fallback cases for invalid types. Currently only multi string, single string, range, boolean fitlers are working. The other types will need more time to fix and integrate.
-
-2. Client component with useState seems to be intentionally forced to run on the server even with the use client directive, causing a useState null error. https://github.com/vercel/next.js/discussions/75993, can't seem to find what's the root cause. Instead, have disabled SSR for product data table.
+1. Client component with useState seems to be intentionally forced to run on the server even with the use client directive, causing a useState null error. https://github.com/vercel/next.js/discussions/75993, can't seem to find what's the root cause. Instead, have disabled SSR for product data table.

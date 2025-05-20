@@ -19,7 +19,7 @@ export const InputWrapper = ({
       >
         {name} {required ? <span className="text-red-500">*</span> : null}
       </label>
-      <div className="flex">{children}</div>
+      <div className="flex items-end">{children}</div>
     </div>
   );
 };

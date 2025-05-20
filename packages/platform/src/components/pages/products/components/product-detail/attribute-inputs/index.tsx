@@ -14,6 +14,8 @@ import { ServerErrorCode } from "@/enums/common";
 import { NumberInput } from "./Number";
 import { MeasureInput } from "./Measure";
 import { RichText } from "./RichText";
+import { BooleanInput } from "./Boolean";
+import { MediaInput } from "./Media";
 interface AttributeInputsProps {
   attribute: Attribute;
   value?: unknown;
@@ -135,6 +137,28 @@ export const AttributeInputs = ({
           onChange={updateProduct}
         />
       );
+
+    case AttributeType.BOOLEAN:
+      return (
+        <BooleanInput
+          value={value as boolean}
+          type={attribute.type}
+          id={attribute.id}
+          name={attribute.name}
+          onChange={updateProduct}
+        />
+      );
+
+    case AttributeType.MEDIA:
+      return (
+        <MediaInput
+          id={attribute.id}
+          name={attribute.name}
+          value={value as string[]}
+          onChange={updateProduct}
+        />
+      );
+
     default:
       return null;
   }
