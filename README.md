@@ -27,9 +27,15 @@ Fullstack app built with Next 15, Prisma, Postgres (NeonTech). Will use React 18
 2. Once the header is selected, the selection index will be sent to the import queue worker.
 
 3. The mapping step has a suggestion step, where the worker will suggest the mapping of attributes based on the header by embedding the Supplier attributes and the CSV file headers. The embeddings are the ranked by cosine similarity. The suggested mapping is then returned along with a confidence score based on the similarity.
-4.
 
 ### Enrichment service
+
+1. Simple SQS to handle enrichment tasks, for now it only does 1 product at a time due to token limit.
+2. The enrichment task is split into 2 stages, first is the context generation stage, where the worker will extract the data from the product attributes and generate context. First is via Web search and second is via OCR.
+   - OCR is done via GPT vision, only for Primary media attributes.
+   - Web search uses only attribute data that was updated by the User to generate context. It will not use AI generated attributes.
+3. The second stage is the enrichment stage, where the worker will use the context to generate the attribute values.
+4. JSON schema is used for strict type adherence, where zod is used to generate schemas on runtime.
 
 ## NextJS architecture design
 
