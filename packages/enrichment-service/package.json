@@ -6,14 +6,31 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "serverless invoke local --function main"
+    "deploy": "AWS_PROFILE=ai-product-hub serverless deploy"
   },
   "devDependencies": {
     "@product-factory/database": "workspace:^",
+    "@product-factory/openai-lib": "workspace:^",
+    "@types/aws-lambda": "^8.10.149",
+    "@types/lodash": "^4.17.16",
+    "prisma": "^6.5.0",
+    "serverless": "^4.14.1",
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-lift": "^1.31.0",
     "serverless-offline": "^14.4.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.782.0"
+    "@aws-sdk/client-lambda": "^3.782.0",
+    "@aws-sdk/client-s3": "^3.782.0",
+    "@aws-sdk/client-sqs": "^3.782.0",
+    "@prisma/client": "^6.5.0",
+    "aws-lambda": "^1.0.7",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^16.4.7",
+    "lodash": "^4.17.21",
+    "openai": "^4.95.0",
+    "zod": "^3.24.2"
   }
 }

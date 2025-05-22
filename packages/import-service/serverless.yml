@@ -57,7 +57,6 @@ constructs:
     maxConcurrency: 10
     worker:
       handler: mappingsWorker.handler
-      environment:
   product-importer-queue:
     type: queue
     batchSize: 1

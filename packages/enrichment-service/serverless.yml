@@ -5,6 +5,11 @@ app: ai-product-hub
 # "service" is the name of this project. This will also be added to your AWS resource names.
 service: enrichment-service
 
+plugins:
+  - serverless-offline
+  - serverless-lift
+  - serverless-dotenv-plugin
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -16,14 +21,35 @@ provider:
             - "logs:CreateLogGroup"
             - "logs:CreateLogStream"
             - "logs:PutLogEvents"
-            - "s3:GetObject"
+            - "sqs:SendMessage"
+            - "sqs:ReceiveMessage"
+            - "sqs:DeleteMessage"
+            - "sqs:GetQueueAttributes"
+            - "lambda:InvokeFunction"
           Resource: "*"
+
+package:
+  individually: true
+  patterns:
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/**/*"
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client/**/*"
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-linux-*"
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-rhel-*"
 
 functions:
   main:
     handler: index.handler
-    memorySize: 1024
-    timeout: 30
+  startEnrichmentTask:
+    handler: startEnrichmentTask.handler
+    environment:
+      ENRICHMENT_QUEUE_URL: ${construct:enrichment-queue.queueUrl}
 
-plugins:
-  - serverless-offline
+constructs:
+  enrichment-queue:
+    type: queue
+    batchSize: 1
+    maxRetries: 1
+    maxConcurrency: 10
+    worker:
+      handler: worker.handler
+      timeout: 600

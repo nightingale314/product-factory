@@ -1,5 +1,4 @@
 import OpenAI from "openai";
-import { config } from "dotenv";
 
 export interface CreateChatCompletionParams {
   apiKey: string;
@@ -33,7 +32,6 @@ export async function createChatCompletion({
   const completion = await openai.chat.completions.create({
     messages,
     model,
-    temperature: 0,
     tools,
     tool_choice: toolChoice,
     response_format: responseFormat,
