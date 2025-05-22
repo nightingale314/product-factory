@@ -2,14 +2,17 @@ import { SQSEvent } from "aws-lambda";
 import {
   Attribute,
   AttributeType,
+  EnrichmentStatus,
   PrismaClient,
   Product,
   ProductAttribute,
+  ProductLastUpdatedBy,
 } from "@prisma/client";
 import { webSearcher } from "./lib/prompts/webSearcher";
 import { ocrAnalyzer } from "./lib/prompts/ocrAnalyzer";
-import { getUpsertManyProductAttributesQuery } from "./lib/upsertMany";
+import { getUpsertManyProductAttributesQuery } from "./lib/query/productAttributeUpsertMany";
 import { batchAttributeEnrichment } from "./lib/batch";
+import { getUpsertManyProductAttributeChangelogQuery } from "./lib/query/productAttributeChangelogUpsert";
 
 interface QueueMessage {
   taskId: string;
@@ -38,6 +41,7 @@ export const handler = async (event: SQSEvent) => {
 
   for (const record of event.Records) {
     let taskId: string | undefined;
+    let supplierId: number | undefined;
     try {
       const message = JSON.parse(record.body) as QueueMessage;
 
@@ -50,7 +54,7 @@ export const handler = async (event: SQSEvent) => {
       }
 
       taskId = message.taskId;
-
+      supplierId = message.supplierId;
       const [attributesToEnrich, products] = await Promise.all([
         db.attribute.findMany({
           where: {
@@ -87,6 +91,7 @@ export const handler = async (event: SQSEvent) => {
                 value: true,
                 productId: true,
                 attribute: true,
+                changeLog: true,
               },
             },
           },
@@ -98,6 +103,8 @@ export const handler = async (event: SQSEvent) => {
         console.error(`No attributes to enrich for task ${taskId}`);
         continue;
       }
+
+      console.log("Attributes to enrich:", attributesToEnrich);
 
       const getProductContextData = async (product: ProductWithAttributes) => {
         const productAttributes = product.attributes;
@@ -136,12 +143,30 @@ export const handler = async (event: SQSEvent) => {
       // Enrichment loop
       for (const product of products) {
         const contextData = await getProductContextData(product);
+        console.log("Context data:", contextData);
+
+        // Do not enrich user-updated attribute values.
+        const filteredAttributesToEnrich = attributesToEnrich.filter((attr) => {
+          const productAttribute = product.attributes.find(
+            (productAttribute) => productAttribute.attribute.id === attr.id
+          );
+
+          if (productAttribute?.changeLog) {
+            return (
+              productAttribute.changeLog.updatedBy !== ProductLastUpdatedBy.USER
+            );
+          }
+
+          return true;
+        });
+
         const enrichmentResponse = await batchAttributeEnrichment({
           productName: product.name,
           ocrContent: contextData.ocrContent || "",
           webSearchResults: contextData.webContent || "",
-          attributesToEnrich,
+          attributesToEnrich: filteredAttributesToEnrich,
         });
+        console.log("Enrichment response:", enrichmentResponse);
 
         const productAttributesUpdateInput = enrichmentResponse.map((attr) => ({
           productId: product.id,
@@ -157,18 +182,51 @@ export const handler = async (event: SQSEvent) => {
           const { query, params } = getUpsertManyProductAttributesQuery(
             productAttributesUpdateInput
           );
-          await db.$executeRawUnsafe(query, ...params);
+          const updatedProductAttributeResponse = await db.$queryRawUnsafe<
+            Array<{ id: string }>
+          >(query, ...params);
+
+          const updatedProductAttributeIds =
+            updatedProductAttributeResponse.map((i) => i.id);
+
+          console.log(
+            "Updated product attribute ids:",
+            updatedProductAttributeIds
+          );
+
+          if (updatedProductAttributeIds.length > 0) {
+            const { query, params } =
+              getUpsertManyProductAttributeChangelogQuery(
+                updatedProductAttributeIds.map((id) => ({
+                  productAttributeId: id,
+                  updatedBy: ProductLastUpdatedBy.ENRICHMENT,
+                  updatedByReferenceId: taskId || "",
+                }))
+              );
+            await db.$queryRawUnsafe(query, ...params);
+          }
         }
       }
+
+      await db.enrichmentTask.update({
+        where: {
+          id: taskId,
+          supplierId,
+        },
+        data: {
+          status: EnrichmentStatus.COMPLETED,
+        },
+      });
     } catch (error) {
       console.error(`Error processing message ${record.messageId}:`, error);
 
       await db.enrichmentTask.update({
         where: {
           id: taskId,
+          supplierId,
         },
         data: {
-          status: "FAILED",
+          status: EnrichmentStatus.FAILED,
         },
       });
 

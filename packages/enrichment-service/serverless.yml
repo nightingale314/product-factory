@@ -37,8 +37,6 @@ package:
     - "../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-rhel-*"
 
 functions:
-  main:
-    handler: index.handler
   startEnrichmentTask:
     handler: startEnrichmentTask.handler
     environment:

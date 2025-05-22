@@ -1,7 +1,7 @@
 import chunk from "lodash/chunk";
 import { AttributeToEnrich, enrichment } from "./prompts/enrichment/enrichment";
 
-const chunkSize = 20;
+const chunkSize = 40;
 
 export const batchAttributeEnrichment = async ({
   productName,
