@@ -63,6 +63,8 @@ export const TableFilter = ({
     setValues(filterValues);
   }, [filterValues]);
 
+  console.log(dynamicFilterList);
+
   return (
     <div style={{ display: "flex", gap: 8 }}>
       <FilterList

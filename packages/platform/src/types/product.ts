@@ -63,11 +63,18 @@ export type GetProductOutput = ServerResponse<ProductWithAttributes>;
 
 export type UpdateProductInput = {
   id: string;
-  skuId: string;
-  name: string;
+  skuId?: string;
+  name?: string;
   attribute?: Omit<ProductAttribute, "id"> & {
     id?: string;
   };
 };
 
 export type UpdateProductOutput = ServerResponse<ProductWithAttributes>;
+
+export type CreateProductInput = {
+  name: string;
+  skuId: string;
+};
+
+export type CreateProductOutput = ServerResponse<Product>;

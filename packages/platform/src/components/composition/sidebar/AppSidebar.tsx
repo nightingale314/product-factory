@@ -1,4 +1,4 @@
-import { CloudUpload, Notebook, Sparkles, Store } from "lucide-react";
+import { CloudUpload, Notebook, Store } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -32,11 +32,6 @@ const items = [
     title: "Attributes",
     url: routes.attributes,
     icon: Notebook,
-  },
-  {
-    title: "Enrichment",
-    url: routes.enrichment,
-    icon: Sparkles,
   },
 ];
 

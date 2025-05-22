@@ -14,6 +14,7 @@ import {
 
 type StringFilterProps = FilterInput & {
   value?: string;
+  operator?: QueryOperator.CONTAINS | QueryOperator.EQUALS;
 };
 
 export const StringFilter = ({
@@ -23,11 +24,12 @@ export const StringFilter = ({
   onApply,
   renderLabel,
   options,
+  operator,
 }: StringFilterProps) => {
   const [inputValue, setInputValue] = useState<string>(value ?? "");
   const [selectedOperator, setSelectedOperator] = useState<
     QueryOperator.CONTAINS | QueryOperator.EQUALS
-  >(QueryOperator.EQUALS);
+  >(operator ?? QueryOperator.EQUALS);
 
   const onMultiStringApplyClick = () => {
     if (inputValue === undefined) {

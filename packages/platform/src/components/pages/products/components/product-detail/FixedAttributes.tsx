@@ -1,13 +1,19 @@
 import { RESERVED_ATTRIBUTES } from "@/constants/attributes";
-import { AttributeType } from "@prisma/client";
+import { AttributeType, Product } from "@prisma/client";
 import { TextInput } from "./attribute-inputs/Text";
-import { ProductWithAttributes } from "@/types/product";
 
 interface FixedAttributesProps {
-  product: ProductWithAttributes | null;
+  product: Partial<Product> | null;
+  onChange: (
+    field: RESERVED_ATTRIBUTES,
+    value: string | null
+  ) => Promise<boolean>;
 }
 
-export const FixedAttributes = ({ product }: FixedAttributesProps) => {
+export const FixedAttributes = ({
+  product,
+  onChange,
+}: FixedAttributesProps) => {
   return (
     <>
       <TextInput
@@ -16,8 +22,12 @@ export const FixedAttributes = ({ product }: FixedAttributesProps) => {
         id={RESERVED_ATTRIBUTES.PRODUCT_NAME}
         type={AttributeType.SHORT_TEXT}
         value={product?.name}
-        onChange={async () => true}
+        onChange={(_, value) =>
+          onChange(RESERVED_ATTRIBUTES.PRODUCT_NAME, value)
+        }
         required
+        lastUpdatedBy={null}
+        lastUpdatedAt={null}
       />
       <TextInput
         name="SKU ID"
@@ -25,8 +35,12 @@ export const FixedAttributes = ({ product }: FixedAttributesProps) => {
         id={RESERVED_ATTRIBUTES.PRODUCT_SKU_ID}
         type={AttributeType.SHORT_TEXT}
         value={product?.skuId}
-        onChange={async () => true}
+        onChange={async (_, value) =>
+          onChange(RESERVED_ATTRIBUTES.PRODUCT_SKU_ID, value)
+        }
         required
+        lastUpdatedBy={null}
+        lastUpdatedAt={null}
       />
     </>
   );

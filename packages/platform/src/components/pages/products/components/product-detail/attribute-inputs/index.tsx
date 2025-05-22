@@ -1,71 +1,30 @@
 "use client";
 
-import { Attribute, AttributeType, ProductAttribute } from "@prisma/client";
+import { Attribute, AttributeType } from "@prisma/client";
 import { TextInput } from "./Text";
-import { toast } from "sonner";
 import { MultiSelectInput } from "./MultiSelect";
 import { DropdownInput } from "./Dropdown";
 import { ProductWithAttributes } from "@/types/product";
-import { SetStateAction } from "react";
-import { Dispatch } from "react";
-import { JsonValue } from "@prisma/client/runtime/library";
-import { updateProduct as updateProductAction } from "@/server-actions/product/updateProduct";
-import { ServerErrorCode } from "@/enums/common";
 import { NumberInput } from "./Number";
 import { MeasureInput } from "./Measure";
 import { RichText } from "./RichText";
 import { BooleanInput } from "./Boolean";
 import { MediaInput } from "./Media";
 import { AttributeInputBaseType } from "./types";
+
 interface AttributeInputsProps {
   attribute: Attribute;
   value?: unknown;
   product: ProductWithAttributes | null;
-  setProduct: Dispatch<SetStateAction<ProductWithAttributes | null>>;
-  onUpdateSuccess?: (newProduct: ProductWithAttributes) => void;
+  onUpdate: (id: string, value: unknown) => Promise<boolean>;
 }
 
 export const AttributeInputs = ({
   attribute,
   value,
   product,
-  setProduct,
-  onUpdateSuccess,
+  onUpdate,
 }: AttributeInputsProps) => {
-  const updateProduct = async (id: string, value: unknown) => {
-    if (!product) return false;
-
-    const attributeToUpdate: Omit<ProductAttribute, "id"> & {
-      id?: string;
-    } = {
-      attributeId: id,
-      value: value as JsonValue,
-      productId: product.id,
-    };
-
-    const updatedProductResponse = await updateProductAction({
-      id: product.id,
-      skuId: product.skuId,
-      name: product.name,
-      attribute: attributeToUpdate,
-    });
-
-    if (
-      updatedProductResponse.errorCode !== ServerErrorCode.SUCCESS ||
-      !updatedProductResponse.data
-    ) {
-      toast.error(`Failed to update attribute "${attribute.name}"`);
-      return false;
-    }
-
-    toast.success(`Attribute "${attribute.name}" updated`);
-
-    setProduct(updatedProductResponse.data);
-    onUpdateSuccess?.(updatedProductResponse.data);
-
-    return true;
-  };
-
   const productAttributeData = product?.attributes.find(
     (attr) => attr.attributeId === attribute.id
   );
@@ -83,12 +42,12 @@ export const AttributeInputs = ({
   switch (attribute.type) {
     case AttributeType.SHORT_TEXT:
     case AttributeType.LONG_TEXT:
-      return <TextInput {...commonProps} onChange={updateProduct} />;
+      return <TextInput {...commonProps} onChange={onUpdate} />;
     case AttributeType.MULTI_SELECT:
       return (
         <MultiSelectInput
           {...commonProps}
-          onChange={updateProduct}
+          onChange={onUpdate}
           options={attribute.selectOptions.map((option) => ({
             label: option,
             value: option,
@@ -99,7 +58,7 @@ export const AttributeInputs = ({
       return (
         <DropdownInput
           {...commonProps}
-          onChange={updateProduct}
+          onChange={onUpdate}
           options={attribute.selectOptions.map((option) => ({
             label: option,
             value: option,
@@ -107,25 +66,25 @@ export const AttributeInputs = ({
         />
       );
     case AttributeType.NUMBER:
-      return <NumberInput {...commonProps} onChange={updateProduct} />;
+      return <NumberInput {...commonProps} onChange={onUpdate} />;
 
     case AttributeType.MEASURE:
       return (
         <MeasureInput
           {...commonProps}
           unitOptions={attribute.measureUnits}
-          onChange={updateProduct}
+          onChange={onUpdate}
         />
       );
 
     case AttributeType.HTML:
-      return <RichText {...commonProps} onChange={updateProduct} />;
+      return <RichText {...commonProps} onChange={onUpdate} />;
 
     case AttributeType.BOOLEAN:
-      return <BooleanInput {...commonProps} onChange={updateProduct} />;
+      return <BooleanInput {...commonProps} onChange={onUpdate} />;
 
     case AttributeType.MEDIA:
-      return <MediaInput {...commonProps} onChange={updateProduct} />;
+      return <MediaInput {...commonProps} onChange={onUpdate} />;
 
     default:
       return null;

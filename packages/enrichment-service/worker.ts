@@ -6,6 +6,7 @@ import {
   PrismaClient,
   Product,
   ProductAttribute,
+  ProductAttributeChangeLog,
   ProductLastUpdatedBy,
 } from "@prisma/client";
 import { webSearcher } from "./lib/prompts/webSearcher";
@@ -32,6 +33,7 @@ const getPrismaClient = () => {
 type ProductWithAttributes = Pick<Product, "id" | "name"> & {
   attributes: (Pick<ProductAttribute, "value" | "productId"> & {
     attribute: Attribute;
+    changeLog: ProductAttributeChangeLog | null;
   })[];
 };
 
@@ -116,6 +118,22 @@ export const handler = async (event: SQSEvent) => {
               attr.attribute.type !== AttributeType.MEDIA &&
               attr.attribute.type !== AttributeType.HTML
           )
+          .filter((attr) => {
+            const productAttribute = product.attributes.find(
+              (productAttribute) =>
+                productAttribute.attribute.id === attr.attribute.id
+            );
+
+            if (productAttribute?.changeLog) {
+              // Do not use AI enriched attributes to generate data context
+              return (
+                productAttribute.changeLog.updatedBy ===
+                ProductLastUpdatedBy.USER
+              );
+            }
+
+            return true;
+          })
           .map((attr) => {
             return {
               name: attr.attribute.name,
@@ -168,11 +186,15 @@ export const handler = async (event: SQSEvent) => {
         });
         console.log("Enrichment response:", enrichmentResponse);
 
-        const productAttributesUpdateInput = enrichmentResponse.map((attr) => ({
-          productId: product.id,
-          attributeId: attr.id,
-          value: attr.value,
-        }));
+        const productAttributesUpdateInput = enrichmentResponse
+          .map((attr) => ({
+            productId: product.id,
+            attributeId: attr.id,
+            value: attr.value,
+          }))
+          .filter((i) =>
+            attributesToEnrich.find((attr) => attr.id === i.attributeId)
+          );
 
         if (
           productAttributesUpdateInput &&

@@ -30,31 +30,18 @@ const convertQueryTypeToPrismaFilterType = (
       const operator =
         value.operator === QueryOperator.CONTAINS
           ? "string_contains"
-          : "string_not_contains";
+          : "equals";
 
-      if (value.operator === QueryOperator.NOT_EQUALS) {
-        return {
-          attributes: {
-            none: {
-              attributeId: value.key,
-              value: {
-                string_contains: value.value,
-              },
+      return {
+        attributes: {
+          some: {
+            attributeId: value.key,
+            value: {
+              [operator]: value.value,
             },
           },
-        };
-      } else {
-        return {
-          attributes: {
-            some: {
-              attributeId: value.key,
-              value: {
-                [operator]: value.value,
-              },
-            },
-          },
-        };
-      }
+        },
+      };
     }
 
     case QueryType.RANGE: {
