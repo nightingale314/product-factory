@@ -34,6 +34,7 @@ export const MediaInput = ({
   value,
   onChange,
   lastUpdatedBy,
+  lastUpdatedAt,
 }: MediaInputProps) => {
   const [loading, setLoading] = useState(false);
   const [existingFiles, setExistingFiles] = useState<string[]>(
@@ -86,7 +87,12 @@ export const MediaInput = ({
   }, [value]);
 
   return (
-    <InputWrapper id={id} name={name} lastUpdatedBy={lastUpdatedBy}>
+    <InputWrapper
+      id={id}
+      name={name}
+      lastUpdatedBy={lastUpdatedBy}
+      lastUpdatedAt={lastUpdatedAt}
+    >
       <div className="flex flex-col gap-4 w-full border rounded p-2">
         <div className="flex items-center justify-between gap-2">
           <UploadButton
