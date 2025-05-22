@@ -8,6 +8,7 @@ Fullstack app built with Next 15, Prisma, Postgres (NeonTech). Will use React 18
 2. Partial validation for product attribute values update. (Lack of time)
 3. Product table sort not completed. (Lack of time)
 4. Product table partially completed. Only Range, String, Boolean filters are working. Complex task to build the serialiser + deserialiser for the filter parser. (Lack of time)
+5. Product import does not create product attribute change logs. (Lack of time)
 
 ## Architecture
 

@@ -1,4 +1,3 @@
-import { AttributeType } from "@prisma/client";
 import { useEffect } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
@@ -8,13 +7,9 @@ import { Switch } from "@/components/ui/switch";
 import { Check } from "lucide-react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AttributeInputBaseType } from "./types";
 
-interface BooleanInputProps {
-  type: AttributeType;
-  required?: boolean;
-  id: string;
-  name: string;
-  value?: unknown;
+interface BooleanInputProps extends AttributeInputBaseType {
   onChange: (id: string, value: boolean | null) => Promise<boolean>;
 }
 
@@ -28,6 +23,8 @@ export const BooleanInput = ({
   required,
   value,
   onChange,
+  lastUpdatedBy,
+  lastUpdatedAt,
 }: BooleanInputProps) => {
   const [displayValue, setDisplayValue] = useState<boolean>(formatValue(value));
   const validate = useValidator({ type, required: !!required });
@@ -59,7 +56,13 @@ export const BooleanInput = ({
   }, [value]);
 
   return (
-    <InputWrapper id={id} name={name} required={required}>
+    <InputWrapper
+      id={id}
+      name={name}
+      required={required}
+      lastUpdatedBy={lastUpdatedBy}
+      lastUpdatedAt={lastUpdatedAt}
+    >
       <div className="flex items-center gap-2">
         <Switch
           id={id}

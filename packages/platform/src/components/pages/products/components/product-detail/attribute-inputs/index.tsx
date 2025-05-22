@@ -16,6 +16,7 @@ import { MeasureInput } from "./Measure";
 import { RichText } from "./RichText";
 import { BooleanInput } from "./Boolean";
 import { MediaInput } from "./Media";
+import { AttributeInputBaseType } from "./types";
 interface AttributeInputsProps {
   attribute: Attribute;
   value?: unknown;
@@ -65,25 +66,28 @@ export const AttributeInputs = ({
     return true;
   };
 
+  const productAttributeData = product?.attributes.find(
+    (attr) => attr.attributeId === attribute.id
+  );
+
+  const commonProps: AttributeInputBaseType = {
+    value,
+    type: attribute.type,
+    id: attribute.id,
+    name: attribute.name,
+    required: attribute.required,
+    lastUpdatedBy: productAttributeData?.changeLog?.updatedBy ?? null,
+    lastUpdatedAt: productAttributeData?.changeLog?.updatedAt ?? null,
+  };
+
   switch (attribute.type) {
     case AttributeType.SHORT_TEXT:
     case AttributeType.LONG_TEXT:
-      return (
-        <TextInput
-          value={value}
-          id={attribute.id}
-          name={attribute.name}
-          type={attribute.type}
-          onChange={updateProduct}
-        />
-      );
+      return <TextInput {...commonProps} onChange={updateProduct} />;
     case AttributeType.MULTI_SELECT:
       return (
         <MultiSelectInput
-          value={value}
-          type={attribute.type}
-          id={attribute.id}
-          name={attribute.name}
+          {...commonProps}
           onChange={updateProduct}
           options={attribute.selectOptions.map((option) => ({
             label: option,
@@ -94,10 +98,7 @@ export const AttributeInputs = ({
     case AttributeType.SINGLE_SELECT:
       return (
         <DropdownInput
-          value={value}
-          type={attribute.type}
-          id={attribute.id}
-          name={attribute.name}
+          {...commonProps}
           onChange={updateProduct}
           options={attribute.selectOptions.map((option) => ({
             label: option,
@@ -106,58 +107,25 @@ export const AttributeInputs = ({
         />
       );
     case AttributeType.NUMBER:
-      return (
-        <NumberInput
-          type={attribute.type}
-          value={value}
-          id={attribute.id}
-          name={attribute.name}
-          onChange={updateProduct}
-        />
-      );
+      return <NumberInput {...commonProps} onChange={updateProduct} />;
 
     case AttributeType.MEASURE:
       return (
         <MeasureInput
-          type={attribute.type}
-          value={value}
-          id={attribute.id}
-          name={attribute.name}
+          {...commonProps}
           unitOptions={attribute.measureUnits}
           onChange={updateProduct}
         />
       );
 
     case AttributeType.HTML:
-      return (
-        <RichText
-          id={attribute.id}
-          name={attribute.name}
-          value={value as string}
-          onChange={updateProduct}
-        />
-      );
+      return <RichText {...commonProps} onChange={updateProduct} />;
 
     case AttributeType.BOOLEAN:
-      return (
-        <BooleanInput
-          value={value as boolean}
-          type={attribute.type}
-          id={attribute.id}
-          name={attribute.name}
-          onChange={updateProduct}
-        />
-      );
+      return <BooleanInput {...commonProps} onChange={updateProduct} />;
 
     case AttributeType.MEDIA:
-      return (
-        <MediaInput
-          id={attribute.id}
-          name={attribute.name}
-          value={value as string[]}
-          onChange={updateProduct}
-        />
-      );
+      return <MediaInput {...commonProps} onChange={updateProduct} />;
 
     default:
       return null;

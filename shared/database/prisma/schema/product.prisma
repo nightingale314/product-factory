@@ -41,13 +41,11 @@ model ProductAttribute {
 
 // 1 to 1 relationship with ProductAttribute
 // to save row space as my free tier db have limited space.
-// Ideally, it should be 1 to many and there should be a cron job to clean
-// up the change logs after a certain period of time.
+// Ideally, it should have a old/new field value and a 1 to many 
+// and there should be a cron job to clean up the change logs after a certain period of time.
 model ProductAttributeChangeLog {
   productAttributeId String @id
   productAttribute ProductAttribute @relation(fields: [productAttributeId], references: [id])
-  oldValue Json
-  newValue Json
   updatedAt DateTime @updatedAt
   updatedBy ProductLastUpdatedBy?
   updatedByReferenceId String?

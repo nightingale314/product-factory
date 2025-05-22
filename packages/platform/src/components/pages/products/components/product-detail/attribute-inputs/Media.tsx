@@ -8,11 +8,9 @@ import chunk from "lodash/chunk";
 import { uploadFile } from "@/lib/upload";
 import { UploadTarget } from "@/constants/upload";
 import { toast } from "sonner";
+import { AttributeInputBaseType } from "./types";
 
-interface MediaInputProps {
-  id: string;
-  name: string;
-  value: string[]; // URLs of saved files
+interface MediaInputProps extends AttributeInputBaseType {
   onChange: (id: string, value: string[]) => void;
 }
 
@@ -30,7 +28,13 @@ const generateS3URL = (fileKey: string) => {
 
 const BATCH_SIZE = 3;
 
-export const MediaInput = ({ id, name, value, onChange }: MediaInputProps) => {
+export const MediaInput = ({
+  id,
+  name,
+  value,
+  onChange,
+  lastUpdatedBy,
+}: MediaInputProps) => {
   const [loading, setLoading] = useState(false);
   const [existingFiles, setExistingFiles] = useState<string[]>(
     formatValue(value)
@@ -82,7 +86,7 @@ export const MediaInput = ({ id, name, value, onChange }: MediaInputProps) => {
   }, [value]);
 
   return (
-    <InputWrapper id={id} name={name}>
+    <InputWrapper id={id} name={name} lastUpdatedBy={lastUpdatedBy}>
       <div className="flex flex-col gap-4 w-full border rounded p-2">
         <div className="flex items-center justify-between gap-2">
           <UploadButton

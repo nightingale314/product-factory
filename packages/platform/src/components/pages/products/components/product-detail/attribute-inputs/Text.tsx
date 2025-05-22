@@ -6,13 +6,9 @@ import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
 import { toast } from "sonner";
 import { useValidator } from "../../../hooks/useValidator";
+import { AttributeInputBaseType } from "./types";
 
-interface TextInputProps {
-  type: AttributeType;
-  required?: boolean;
-  id: string;
-  name: string;
-  value?: unknown;
+interface TextInputProps extends AttributeInputBaseType {
   onChange: (id: string, value: string | null) => Promise<boolean>;
 }
 
@@ -26,6 +22,8 @@ export const TextInput = ({
   required,
   value,
   onChange,
+  lastUpdatedBy,
+  lastUpdatedAt,
 }: TextInputProps) => {
   const [displayValue, setDisplayValue] = useState(formatValue(value) ?? "");
   const validate = useValidator({ type, required: !!required });
@@ -52,7 +50,13 @@ export const TextInput = ({
 
   if (type === AttributeType.LONG_TEXT) {
     return (
-      <InputWrapper id={id} name={name} required={required}>
+      <InputWrapper
+        id={id}
+        name={name}
+        required={required}
+        lastUpdatedBy={lastUpdatedBy}
+        lastUpdatedAt={lastUpdatedAt}
+      >
         <Textarea
           id={id}
           value={displayValue}
@@ -64,7 +68,13 @@ export const TextInput = ({
   }
 
   return (
-    <InputWrapper id={id} name={name} required={required}>
+    <InputWrapper
+      id={id}
+      name={name}
+      required={required}
+      lastUpdatedBy={lastUpdatedBy}
+      lastUpdatedAt={lastUpdatedAt}
+    >
       <Input
         id={id}
         value={displayValue}

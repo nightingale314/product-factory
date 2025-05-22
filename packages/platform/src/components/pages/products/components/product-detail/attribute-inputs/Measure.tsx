@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { AttributeType } from "@prisma/client";
 import { useEffect } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
@@ -14,13 +13,9 @@ import {
 } from "@/components/ui/select";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AttributeInputBaseType } from "./types";
 
-interface MeasureInputProps {
-  type: AttributeType;
-  required?: boolean;
-  id: string;
-  name: string;
-  value?: unknown; // {value: number, unit: string}
+interface MeasureInputProps extends AttributeInputBaseType {
   unitOptions: string[];
   onChange: (
     id: string,
@@ -68,6 +63,8 @@ export const MeasureInput = ({
   required,
   value,
   onChange,
+  lastUpdatedBy,
+  lastUpdatedAt,
   unitOptions,
 }: MeasureInputProps) => {
   const [displayValue, setDisplayValue] = useState<{
@@ -121,7 +118,13 @@ export const MeasureInput = ({
   }, [value]);
 
   return (
-    <InputWrapper id={id} name={name} required={required}>
+    <InputWrapper
+      id={id}
+      name={name}
+      required={required}
+      lastUpdatedBy={lastUpdatedBy}
+      lastUpdatedAt={lastUpdatedAt}
+    >
       <div className="flex items-center gap-2">
         <Input
           type="number"

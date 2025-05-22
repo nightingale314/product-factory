@@ -1,17 +1,12 @@
 import { Input } from "@/components/ui/input";
-import { AttributeType } from "@prisma/client";
 import { useEffect } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
 import { toast } from "sonner";
 import { useValidator } from "../../../hooks/useValidator";
+import { AttributeInputBaseType } from "./types";
 
-interface NumberInputProps {
-  type: AttributeType;
-  required?: boolean;
-  id: string;
-  name: string;
-  value?: unknown;
+interface NumberInputProps extends AttributeInputBaseType {
   onChange: (id: string, value: string | null) => Promise<boolean>;
 }
 
@@ -25,6 +20,8 @@ export const NumberInput = ({
   required,
   value,
   onChange,
+  lastUpdatedBy,
+  lastUpdatedAt,
 }: NumberInputProps) => {
   const [displayValue, setDisplayValue] = useState(formatValue(value) ?? "");
   const validate = useValidator({ type, required: !!required });
@@ -50,7 +47,13 @@ export const NumberInput = ({
   }, [value]);
 
   return (
-    <InputWrapper id={id} name={name} required={required}>
+    <InputWrapper
+      id={id}
+      name={name}
+      required={required}
+      lastUpdatedBy={lastUpdatedBy}
+      lastUpdatedAt={lastUpdatedAt}
+    >
       <Input
         type="number"
         id={id}

@@ -32,10 +32,12 @@ const generateColumns = (attributes: Attribute[]) =>
             (productAttr) => productAttr.attributeId === attr.id
           );
           return (
-            <ProductTableCell
-              attribute={attr}
-              productAttribute={productAttribute}
-            />
+            <div className="max-w-[500px] truncate">
+              <ProductTableCell
+                attribute={attr}
+                productAttribute={productAttribute}
+              />
+            </div>
           );
         },
       } satisfies ColumnDef<ProductWithAttributes>)

@@ -1,4 +1,3 @@
-import { AttributeType } from "@prisma/client";
 import { useCallback } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
@@ -6,13 +5,9 @@ import { toast } from "sonner";
 import { useValidator } from "../../../hooks/useValidator";
 import { MultiAsyncSelect } from "@/components/ui/multi-select";
 import { debounce } from "lodash";
+import { AttributeInputBaseType } from "./types";
 
-interface MultiSelectInputProps {
-  type: AttributeType;
-  required?: boolean;
-  id: string;
-  name: string;
-  value?: unknown;
+interface MultiSelectInputProps extends AttributeInputBaseType {
   options?: { label: string; value: string }[];
   onChange: (id: string, value: string[] | null) => Promise<boolean>;
 }
@@ -33,6 +28,8 @@ export const MultiSelectInput = ({
   value,
   onChange,
   options,
+  lastUpdatedBy,
+  lastUpdatedAt,
 }: MultiSelectInputProps) => {
   const [loading, setLoading] = useState(false);
   const [displayValue, setDisplayValue] = useState<string[]>(
@@ -62,7 +59,13 @@ export const MultiSelectInput = ({
   );
 
   return (
-    <InputWrapper id={id} name={name} required={required}>
+    <InputWrapper
+      id={id}
+      name={name}
+      required={required}
+      lastUpdatedBy={lastUpdatedBy}
+      lastUpdatedAt={lastUpdatedAt}
+    >
       <MultiAsyncSelect
         id={id}
         disabled={loading}

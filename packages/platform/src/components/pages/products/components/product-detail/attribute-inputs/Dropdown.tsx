@@ -1,4 +1,3 @@
-import { AttributeType } from "@prisma/client";
 import { useEffect } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
@@ -11,13 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AttributeInputBaseType } from "./types";
 
-interface DropdownInputProps {
-  type: AttributeType;
-  required?: boolean;
-  id: string;
-  name: string;
-  value?: unknown;
+interface DropdownInputProps extends AttributeInputBaseType {
   options?: { label: string; value: string }[];
   onChange: (id: string, value: string | null) => Promise<boolean>;
 }
@@ -38,6 +33,8 @@ export const DropdownInput = ({
   value,
   onChange,
   options,
+  lastUpdatedBy,
+  lastUpdatedAt,
 }: DropdownInputProps) => {
   const [loading, setLoading] = useState(false);
   const [displayValue, setDisplayValue] = useState<string>(formatValue(value));
@@ -66,7 +63,13 @@ export const DropdownInput = ({
   }, [value]);
 
   return (
-    <InputWrapper id={id} name={name} required={required}>
+    <InputWrapper
+      id={id}
+      name={name}
+      required={required}
+      lastUpdatedBy={lastUpdatedBy}
+      lastUpdatedAt={lastUpdatedAt}
+    >
       <Select
         name={id}
         value={displayValue}

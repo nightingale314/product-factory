@@ -2,7 +2,7 @@
 
 import { getAuthSession } from "@/lib/auth/getAuthSession";
 import { ServerErrorCode } from "@/enums/common";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ProductLastUpdatedBy } from "@prisma/client";
 import { UpdateProductInput, UpdateProductOutput } from "@/types/product";
 import { serverLogger } from "@/lib/logger/serverLogger";
 import { InputJsonValue } from "@prisma/client/runtime/library";
@@ -45,7 +45,22 @@ export const updateProduct = async (
           : undefined,
       },
       include: {
-        attributes: true,
+        attributes: {
+          select: {
+            attributeId: true,
+            productId: true,
+            value: true,
+            changeLog: true,
+            id: true,
+          },
+        },
+        latestEnrichmentTask: {
+          select: {
+            id: true,
+            status: true,
+            updatedAt: true,
+          },
+        },
       },
     });
 
@@ -54,6 +69,27 @@ export const updateProduct = async (
         errorCode: ServerErrorCode.UNEXPECTED_ERROR,
         data: null,
       };
+    }
+
+    const updatedAttribute = updatedProduct.attributes.find(
+      (attribute) => attribute.attributeId === input.attribute?.attributeId
+    );
+
+    if (updatedAttribute) {
+      await prisma.productAttributeChangeLog.upsert({
+        where: {
+          productAttributeId: updatedAttribute.id,
+        },
+        update: {
+          updatedBy: ProductLastUpdatedBy.USER,
+          updatedByReferenceId: user.id,
+        },
+        create: {
+          productAttributeId: updatedAttribute.id,
+          updatedBy: ProductLastUpdatedBy.USER,
+          updatedByReferenceId: user.id,
+        },
+      });
     }
 
     return {

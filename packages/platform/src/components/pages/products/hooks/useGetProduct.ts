@@ -27,6 +27,7 @@ export const useGetProduct = ({ skuId, initialData }: UseGetProduct) => {
     // if (Date.now() - lastFetched > 10000) {
     //   fetchProduct(skuId);
     // }
+    setProduct(initialData ?? null);
   }, [initialData, skuId, lastFetched]);
 
   return { product, fetchProduct, isLoading, setProduct };

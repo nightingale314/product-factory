@@ -1,4 +1,10 @@
-import { Product, ProductAttribute, ProductImportTask } from "@prisma/client";
+import {
+  EnrichmentTask,
+  Product,
+  ProductAttribute,
+  ProductAttributeChangeLog,
+  ProductImportTask,
+} from "@prisma/client";
 import {
   ServerResponse,
   ServerResponseList,
@@ -6,8 +12,17 @@ import {
 } from "./common";
 import { ImportProductsAttributeMapping } from "@product-factory/import-service/lib/generateProductsFromMappings";
 import { QueryValue } from "@/lib/parsers/types";
+
+export type ProductAttributeWithChangeLog = ProductAttribute & {
+  changeLog: ProductAttributeChangeLog | null;
+};
+
 export type ProductWithAttributes = Product & {
-  attributes: ProductAttribute[];
+  attributes: ProductAttributeWithChangeLog[];
+  latestEnrichmentTask: Pick<
+    EnrichmentTask,
+    "id" | "status" | "updatedAt"
+  > | null;
 };
 
 export type GetActiveImportOutput = ServerResponse<ProductImportTask>;

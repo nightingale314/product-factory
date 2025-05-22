@@ -202,7 +202,23 @@ export const listProductLoader = async (
       },
       orderBy,
       include: {
-        attributes: true,
+        attributes: {
+          select: {
+            attributeId: true,
+            productId: true,
+            value: true,
+            changeLog: true,
+            id: true,
+          },
+        },
+        latestEnrichmentTask: {
+          select: {
+            id: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
     });
 

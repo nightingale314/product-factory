@@ -22,7 +22,22 @@ export const getProductLoader = async (
         },
       },
       include: {
-        attributes: true,
+        attributes: {
+          select: {
+            attributeId: true,
+            productId: true,
+            value: true,
+            changeLog: true,
+            id: true,
+          },
+        },
+        latestEnrichmentTask: {
+          select: {
+            id: true,
+            status: true,
+            updatedAt: true,
+          },
+        },
       },
     });
 

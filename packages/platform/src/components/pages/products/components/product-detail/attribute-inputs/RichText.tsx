@@ -2,18 +2,23 @@ import { RichTextEditor } from "@/components/ui/rich-text";
 import { InputWrapper } from "./InputWrapper";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { AttributeInputBaseType } from "./types";
 
-export interface RichTextProps {
-  id: string;
-  name: string;
-  value: unknown;
+export interface RichTextProps extends AttributeInputBaseType {
   onChange: (id: string, value: string | null) => Promise<boolean>;
 }
 
 const formatValue = (value: unknown) =>
   typeof value === "string" && value.trim() !== "" ? value : "";
 
-export const RichText = ({ id, name, value, onChange }: RichTextProps) => {
+export const RichText = ({
+  id,
+  name,
+  value,
+  onChange,
+  lastUpdatedBy,
+  lastUpdatedAt,
+}: RichTextProps) => {
   const [isEditable, setIsEditable] = useState(false);
   const [displayValue, setDisplayValue] = useState<string>(formatValue(value));
 
@@ -36,7 +41,12 @@ export const RichText = ({ id, name, value, onChange }: RichTextProps) => {
   }, [value]);
 
   return (
-    <InputWrapper id={id} name={name}>
+    <InputWrapper
+      id={id}
+      name={name}
+      lastUpdatedBy={lastUpdatedBy}
+      lastUpdatedAt={lastUpdatedAt}
+    >
       <div
         onClick={() => {
           if (!isEditable) {

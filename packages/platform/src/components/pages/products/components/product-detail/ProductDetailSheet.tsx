@@ -15,6 +15,10 @@ import { AttributeInputs } from "./attribute-inputs";
 import { FixedAttributes } from "./FixedAttributes";
 import { MediaCell } from "@/components/composition/table/cells/media";
 import { Badge } from "@/components/ui/badge";
+import { startEnrichmentAction } from "@/server-actions/enrichment/startEnrichmentAction";
+import { toast } from "sonner";
+import { ServerErrorCode } from "@/enums/common";
+import { useState } from "react";
 
 interface ProductDetailSheetProps {
   skuId: string;
@@ -29,6 +33,8 @@ export const ProductDetailSheet = ({
   attributes,
   onUpdateSuccess,
 }: ProductDetailSheetProps) => {
+  const [isEnrichmentLoading, setIsEnrichmentLoading] = useState(false);
+
   const { product, setProduct } = useGetProduct({
     skuId,
     initialData: productData,
@@ -42,6 +48,20 @@ export const ProductDetailSheet = ({
     (i) => i.attributeId === primaryMediaAttribute?.id
   );
 
+  const startEnrichment = async () => {
+    setIsEnrichmentLoading(true);
+    const response = await startEnrichmentAction({
+      productIds: [productData.id],
+    });
+
+    if (response.errorCode === ServerErrorCode.SUCCESS) {
+      toast.success(`Enrichment started for '${productData.name}'`);
+    } else {
+      toast.error("Failed to start enrichment");
+    }
+    setIsEnrichmentLoading(false);
+  };
+
   return (
     <div>
       <Sheet
@@ -52,7 +72,7 @@ export const ProductDetailSheet = ({
         }}
       >
         <SheetTrigger asChild>
-          <Button variant="link" className="!p-0">
+          <Button variant="link" className="!p-0 ">
             {skuId}
           </Button>
         </SheetTrigger>
@@ -63,21 +83,31 @@ export const ProductDetailSheet = ({
         >
           <SheetHeader>
             <SheetTitle>
-              <div className="flex items-center gap-2">
-                <MediaCell
-                  urls={(firstMedia?.value ?? []) as string[]}
-                  className="w-16 h-16"
-                />
-                <div>
-                  <h1>{productData.name}</h1>
-                  <Badge variant="outline" className="text-xs font-medium">
-                    Product ID: {productData.id}
-                  </Badge>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MediaCell
+                    urls={(firstMedia?.value ?? []) as string[]}
+                    className="w-16 h-16"
+                  />
+                  <div>
+                    <h1>{productData.name}</h1>
+                    <Badge variant="outline" className="text-xs font-medium">
+                      Product ID: {productData.id}
+                    </Badge>
+                  </div>
                 </div>
+                <Button
+                  size="sm"
+                  onClick={startEnrichment}
+                  isLoading={isEnrichmentLoading}
+                  disabled={isEnrichmentLoading}
+                >
+                  Start Enrichment
+                </Button>
               </div>
             </SheetTitle>
             <p className="text-xs text-muted-foreground mt-2">
-              Changes are saved automatically
+              Changes are saved automatically once you focus out.
             </p>
             <div className="flex flex-col gap-2 py-4">
               <div className="flex flex-col gap-4">

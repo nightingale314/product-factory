@@ -1,20 +1,22 @@
 "use server";
 
+import { ServerErrorCode } from "@/enums/common";
 import { getAuthSession } from "@/lib/auth/getAuthSession";
+import { StartEnrichmentTaskSchema } from "@/schemas/enrichment/startEnrichmentTask";
+import { ServerResponse } from "@/types/common";
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 import { fromEnv } from "@aws-sdk/credential-providers";
-import { CreateImportTaskInput, CreateImportTaskOutput } from "@/types/product";
-import { ServerErrorCode } from "@/enums/common";
-import { ProductImportTask } from "@prisma/client";
+import { EnrichmentTask } from "@prisma/client";
 
-type StartImportTaskEventResponse = {
+type StartEnrichmentTaskEventResponse = {
   errorCode: number;
   message?: string;
-  data: ProductImportTask;
+  data: EnrichmentTask;
 };
-export const createImportTask = async (
-  input: CreateImportTaskInput
-): Promise<CreateImportTaskOutput> => {
+
+export const startEnrichmentAction = async (
+  input: StartEnrichmentTaskSchema
+): Promise<ServerResponse<EnrichmentTask>> => {
   const session = await getAuthSession();
 
   try {
@@ -23,17 +25,14 @@ export const createImportTask = async (
       credentials: fromEnv(),
     });
 
-    const functionName = process.env.IMPORT_SERVICE_NAME
-      ? `${process.env.IMPORT_SERVICE_NAME}-startImportTask`
+    const functionName = process.env.ENRICHMENT_SERVICE_NAME
+      ? `${process.env.ENRICHMENT_SERVICE_NAME}-startEnrichmentTask`
       : "";
 
     const inputPayload = {
       supplierId: session.user.supplierId,
-      taskType: input.taskType,
-      fileKey: input.fileKey,
-      headerIndex: input.headerIndex,
-      taskId: input.taskId,
-      selectedMappings: input.selectedMappings,
+      productIds: input.productIds,
+      attributeIds: input.attributeIds ?? [],
     };
 
     const command = new InvokeCommand({
@@ -47,12 +46,14 @@ export const createImportTask = async (
       throw new Error(`Lambda invocation failed: ${response.FunctionError}`);
     }
 
-    const payload: StartImportTaskEventResponse | null = response.Payload
+    const payload: StartEnrichmentTaskEventResponse | null = response.Payload
       ? JSON.parse(Buffer.from(response.Payload).toString())
       : null;
 
     if (payload?.errorCode || !payload?.data) {
-      throw new Error(payload?.message ?? "Start import task lambda failed");
+      throw new Error(
+        payload?.message ?? "Start enrichment task lambda failed"
+      );
     }
 
     return {
