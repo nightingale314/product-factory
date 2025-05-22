@@ -1,11 +1,19 @@
 export const routes = {
   home: "/",
   login: "/login",
-  products: "/products",
+  products: {
+    root: "/products",
+    detail: (id: string) => `/products/${id}`,
+  },
   attributes: "/attributes",
   enrichment: "/enrichment",
+  import: {
+    products: "/import",
+  },
 };
 
 export const apiRoutes = {
   attributes: "/api/attributes",
+  import: "/api/import",
+  product: "/api/product",
 };

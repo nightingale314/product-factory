@@ -2,27 +2,48 @@
 
 Fullstack app built with Next 15, Prisma, Postgres (NeonTech). Will use React 18 implementation as I am not familiar with React 19.
 
-## Setup
+## Incomplete features
 
-1. Setup an account + project at neon tech, it's a managed Postgres provider with free tier.
-2. Paste your project's database url at `DATABASE_URL`
-3. Generate a random Auth secret at `AUTH_SECRET`
-4. Run `yarn prisma generate`
-5. Run `npx prisma migrate dev`
+1. Product detail page does not support datetime attributes. (Lack of time)
+2. Partial validation for product attribute values update. (Lack of time)
+3. Product table sort not completed. (Lack of time)
+4. Product table partially completed. Only Range, String, Boolean filters are working. Complex task to build the serialiser + deserialiser for the filter parser. (Lack of time)
+5. Product import does not create product attribute change logs. (Lack of time)
 
-## Running local
+## Architecture
 
-This project uses pnpm workspace for a monorepo setup.
+### Notes
 
-Run the FE development server
+1. This proejct uses NextJS as the fullstack framework, alongside with AWS serverless services for long live tasks (Import service + Enrichment service). All components are in a monorepo setup. Due to lack of time, deployment for the BE services are done locally instead of in a pipeline. serverless framework is used for orchestrating the services via IaaC.
 
-```bash
-pnpm run dev:platform
-```
+2. SQL is chosen for it's relational properties. In the concept of Products paired with dynamic Attributes, it is of a many to many relationship. With that it's easier and more performant to perform queries. a JSONValue with GIN index is used for the ProductAttributes table's value field, where it is optimized for searching complex data types. As such NeonTech (Postgres provider) was selected just for ease of setup and free tier.
+
+3. Queues are used for the import and enrichment services as they are long running tasks.
+
+### Import service
+
+1. The select header step is done on the client as the step has high risks of cancellation. Because the CSV is processed as a stream with max row count, the performance is very fast.
+
+2. Once the header is selected, the selection index will be sent to the import queue worker.
+
+3. The mapping step has a suggestion step, where the worker will suggest the mapping of attributes based on the header by embedding the Supplier attributes and the CSV file headers. The embeddings are the ranked by cosine similarity. The suggested mapping is then returned along with a confidence score based on the similarity.
+
+### Enrichment service
+
+1. Simple SQS to handle enrichment tasks, for now it only does 1 product at a time due to token limit.
+2. The enrichment task is split into 2 stages, first is the context generation stage, where the worker will extract the data from the product attributes and generate context. First is via Web search and second is via OCR.
+   - OCR is done via GPT vision, only for Primary media attributes.
+   - Web search uses only attribute data that was updated by the User to generate context. It will not use AI generated attributes.
+3. The second stage is the enrichment stage, where the worker will use the context to generate the attribute values.
+4. JSON schema is used for strict type adherence, where zod is used to generate schemas on runtime.
 
 ## NextJS architecture design
 
 1. Server actions are used for mutations whereas API Route handlers are used for data fetching. Reason is because data fetching is a HTTP network request that can be cached easily with conventional methods.
+
+2. All DB queries are done in the NextJS platform. This is to streamline development efforts.
+
+3. This project skipped the usage of NextJS middleware because of it's edge runtime. Prisma ORM does not support edge runtime as of now.
 
 ## Scalability notes
 
@@ -30,8 +51,8 @@ pnpm run dev:platform
 
    Since attributes and products are always under a specific supplier, a solution would be to partition them based on supplier id. As Prisma does not support partitions in the schema definition itself, and for the interest of time, this part will be skipped.
 
-2. Due to time and resource constraints, it's not feasible to setup a object storage bucket, queue etc for an assignment, which is why some shortcuts were taken. E.g.
+2. Also, the business would fit a multi tenant database design instead, where each customer is a tenant who has their own dedicated database instance. Advantages includes better scalability, isolation, and resource utilization. Moreover with attribute enrichment being a high I/O operation, having dedicated database instances would help with performance.
 
-   For CSV product imports, ideally the client will upload the CSV to a storage bucket and send the file URL to the server for async processing. In this assignment, we will process it in the NextJS api router instead.
+## Bug list
 
-   For product enrichment, ideally there will be a queue to manage the processing of products. To keep this simple, we will only allow single enrichment instead of batch enrichment.
+1. Client component with useState seems to be intentionally forced to run on the server even with the use client directive, causing a useState null error. https://github.com/vercel/next.js/discussions/75993, can't seem to find what's the root cause. Instead, have disabled SSR for product data table.

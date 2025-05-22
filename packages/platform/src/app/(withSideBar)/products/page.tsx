@@ -1,22 +1,17 @@
 import { ProductsIndex } from "@/components/pages/products";
-import { routes } from "@/constants/routes";
-import { auth } from "@/lib/auth/auth";
+import { getAuthSession } from "@/lib/auth/getAuthSession";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { PageProps } from "@/types/common";
 
 export const metadata: Metadata = {
   title: "Products | Product Factory",
   description: "Products | Product Factory",
 };
 
-const ProductPage = async () => {
-  const session = await auth();
+const ProductPage = async ({ searchParams }: PageProps) => {
+  await getAuthSession();
 
-  if (!session?.user) {
-    redirect(routes.login);
-  }
-
-  return <ProductsIndex />;
+  return <ProductsIndex searchParams={searchParams} />;
 };
 
 export default ProductPage;

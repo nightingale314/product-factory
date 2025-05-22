@@ -5,6 +5,11 @@ app: ai-product-hub
 # "service" is the name of this project. This will also be added to your AWS resource names.
 service: import-service
 
+plugins:
+  - serverless-offline
+  - serverless-lift
+  - serverless-dotenv-plugin
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -17,11 +22,45 @@ provider:
             - "logs:CreateLogStream"
             - "logs:PutLogEvents"
             - "s3:GetObject"
-          Resource: "*"
+            - "sqs:SendMessage"
+            - "sqs:ReceiveMessage"
+            - "sqs:DeleteMessage"
+            - "sqs:GetQueueAttributes"
+            - "lambda:InvokeFunction"
+          Resource:
+            - "arn:aws:s3:::ai-product-hub-product-import/*"
+
+package:
+  individually: true
+  patterns:
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/**/*"
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client/**/*"
+    # - "!../../node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/engines/**"
+    # - "!../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-*"
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-linux-*"
+    - "../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/libquery_engine-rhel-*"
 
 functions:
-  main:
-    handler: index.handler
+  testHandler:
+    handler: testHandler.handler
+  startImportTask:
+    handler: startImportTask.handler
+    environment:
+      MAPPINGS_GENERATOR_QUEUE_URL: ${construct:mappings-generator-queue.queueUrl}
+      IMPORTER_QUEUE_URL: ${construct:product-importer-queue.queueUrl}
 
-plugins:
-  - serverless-offline
+constructs:
+  mappings-generator-queue:
+    type: queue
+    batchSize: 1
+    maxRetries: 1
+    maxConcurrency: 10
+    worker:
+      handler: mappingsWorker.handler
+  product-importer-queue:
+    type: queue
+    batchSize: 1
+    maxRetries: 1
+    maxConcurrency: 10
+    worker:
+      handler: importerWorker.handler

@@ -23,7 +23,6 @@ const attributeTypes = [
   { label: "Number", value: AttributeType.NUMBER },
   { label: "Boolean", value: AttributeType.BOOLEAN },
   { label: "Date", value: AttributeType.DATE },
-  { label: "Datetime", value: AttributeType.DATETIME },
   { label: "Single select", value: AttributeType.SINGLE_SELECT },
   { label: "Multi select", value: AttributeType.MULTI_SELECT },
   { label: "HTML", value: AttributeType.HTML },
@@ -37,6 +36,7 @@ export function CreateAttributeFormItems() {
     control,
     register,
     unregister,
+    setValue,
     formState: { errors, defaultValues },
   } = useFormContext<CreateAttributeSchema>();
 
@@ -48,6 +48,15 @@ export function CreateAttributeFormItems() {
       attributeType !== AttributeType.MULTI_SELECT
     ) {
       unregister("selectOptions");
+    }
+    if (attributeType !== AttributeType.MEASURE) {
+      unregister("measureUnits");
+    }
+    if (attributeType === AttributeType.MEDIA) {
+      setValue("enrichmentEnabled", false);
+    }
+    if (attributeType !== AttributeType.MEDIA) {
+      unregister("primaryMedia");
     }
   }, [attributeType]);
 
@@ -132,6 +141,51 @@ export function CreateAttributeFormItems() {
         />
       )}
 
+      {attributeType === AttributeType.MEASURE && (
+        <Controller
+          name="measureUnits"
+          control={control}
+          render={({ field }) => (
+            <FormField
+              name="measureUnits"
+              errors={errors}
+              label="Attribute Measure Units"
+              className="col-span-2"
+              description="Enter the units for the measure attribute. Each unit should be unique and on a new line."
+            >
+              <SelectAttributeConfig
+                initialOptions={field?.value}
+                onChange={(options) => {
+                  field.onChange(options);
+                }}
+              />
+            </FormField>
+          )}
+        />
+      )}
+
+      {attributeType === AttributeType.MEDIA && (
+        <Controller
+          name="primaryMedia"
+          control={control}
+          render={({ field }) => (
+            <FormField
+              name="primaryMedia"
+              errors={errors}
+              label="Primary Media"
+              vertical={false}
+              description="If enabled, this attribute will be used as the primary media for the product."
+            >
+              <Switch
+                {...field}
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormField>
+          )}
+        />
+      )}
+
       <Controller
         name="required"
         control={control}
@@ -157,6 +211,7 @@ export function CreateAttributeFormItems() {
         name="enrichmentEnabled"
         control={control}
         rules={{ required: true }}
+        disabled={attributeType === AttributeType.MEDIA}
         render={({ field }) => (
           <FormField
             name="enrichmentEnabled"

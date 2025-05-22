@@ -23,7 +23,7 @@ export const convertOffsetLimitToPagination = (
 };
 
 export const convertSortToOrderBy = <T>(sort?: Sort<T>) => {
-  if (!sort) return { ["createdAt" as keyof T]: "desc" };
+  if (!sort) return { ["updatedAt" as keyof T]: "desc" };
 
   const { field, order } = sort;
   return { [field]: order satisfies Prisma.SortOrder };

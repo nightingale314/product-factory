@@ -6,6 +6,7 @@ model Supplier {
   users User[]
   attributes Attribute[]
   products Product[]
-
+  productImportTasks ProductImportTask[]
+  enrichmentTasks EnrichmentTask[]
   @@map("suppliers")
 }

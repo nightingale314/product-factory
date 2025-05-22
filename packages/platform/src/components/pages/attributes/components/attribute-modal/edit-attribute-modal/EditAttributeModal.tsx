@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
-import { Attribute } from "@prisma/client";
+import { Attribute, AttributeType } from "@prisma/client";
 import { ServerErrorCode } from "@/enums/common";
 import { toast } from "sonner";
 import { updateAttributeAction } from "@/server-actions/attributes/updateAttributeAction";
@@ -22,7 +22,7 @@ import { EditAttributeFormItems } from "./EditAttributeFormItems";
 interface EditAttributeModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  initialAttribute?: Attribute;
+  initialAttribute: Attribute;
   onEditSuccess?: (attribute: Attribute) => void;
 }
 
@@ -37,12 +37,15 @@ export function EditAttributeModal({
     values: {
       ...initialAttribute,
       name: initialAttribute?.name || "",
+      type: initialAttribute?.type || AttributeType.SHORT_TEXT,
       description: initialAttribute?.description || undefined,
       enrichmentInstructions:
         initialAttribute?.enrichmentInstructions || undefined,
       required: initialAttribute?.required || false,
       enrichmentEnabled: initialAttribute?.enrichmentEnabled || false,
       selectOptions: initialAttribute?.selectOptions || [],
+      measureUnits: initialAttribute?.measureUnits || [],
+      primaryMedia: initialAttribute?.primaryMedia || false,
     },
   });
 

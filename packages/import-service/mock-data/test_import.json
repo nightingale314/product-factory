@@ -1,0 +1,81 @@
+{
+  "products": [
+    {
+      "product": {
+        "name": "Instant Rice Fettuccine",
+        "skuId": "SKU00001"
+      },
+      "attributes": [
+        {
+          "attributeId": "19asd239SD23ksd",
+          "value": "<div>Test HTML</div>"
+        },
+        {
+          "attributeId": "sbsdg8sJSD23hs40",
+          "value": true
+        },
+        {
+          "attributeId": "hgijdfg8s7SDnss",
+          "value": [
+            "https://s3.ap-\nsoutheast-\n1.amazonaws.com/\nsup-por-qa-\nbackend-\nasset/12%2FPROD\nUCT_IMAGE%2Fbdd\n95ab691b1a75d2fa\naea310ffca76f",
+            "https://s3.ap-\nsoutheast-\n1.amazonaws.com/\nsup-por-qa-\nbackend-\nasset/12%2FPROD\nUCT_IMAGE%2F12_\n9_1704354861484_\nsampleocr_1.jpeg"
+          ]
+        },
+        {
+          "attributeId": "98hlfgk23jsdIsd",
+          "value": "Koka"
+        },
+        {
+          "attributeId": "PWsfgJFK37sd9we23",
+          "value": {
+            "value": 10,
+            "unit": "KG"
+          }
+        }
+      ]
+    },
+    {
+      "product": {
+        "name": "Black Neck Cord with Buckle",
+        "skuId": "SSKU00002"
+      },
+      "attributes": [
+        {
+          "attributeId": "19asd239SD23ksd",
+          "value": "<div>Test HTML</div>"
+        },
+        {
+          "attributeId": "sbsdg8sJSD23hs40",
+          "value": false
+        },
+        {
+          "attributeId": "hgijdfg8s7SDnss",
+          "value": [
+            "https://s3.ap-\nsoutheast-\n1.amazonaws.com/\nsup-por-qa-\nbackend-\nasset/12%2FPROD\nUCT_IMAGE%2F4_P\nRODUCT_IMAGE_9c\n782ac8-9bb5-4541-\na4d7-2f5fb34881fc-\nVT5qUM1Tczlo4yy2\nnLASg.jpg"
+          ]
+        },
+        {
+          "attributeId": "Isdo48jhgA64jsfh",
+          "value": 123123
+        },
+        {
+          "attributeId": "98hlfgk23jsdIsd",
+          "value": "Univet"
+        },
+        {
+          "attributeId": "PWsfgJFK37sd9we23",
+          "value": {
+            "value": 12323,
+            "unit": "KG"
+          }
+        }
+      ]
+    }
+  ],
+  "rowWithIssues": [
+    {
+      "rowIndex": 3,
+      "error": "Invalid SKU ID"
+    }
+  ]
+}

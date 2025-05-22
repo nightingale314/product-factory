@@ -1,15 +1,24 @@
 
+enum ProductLastUpdatedBy {
+  USER
+  ENRICHMENT
+}
+
 model Product {
   id String @id @default(cuid())
   supplierId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   name String
-  type AttributeType
-  skuId String @unique
+  skuId String
   supplier Supplier @relation(fields: [supplierId], references: [id])
   attributes ProductAttribute[]
 
+  latestEnrichmentTaskId String? // nullable FK
+  latestEnrichmentTask EnrichmentTask? @relation("Product_latestEnrichmentTask", fields: [latestEnrichmentTaskId], references: [id])
+
+  // Composite unique constraint
+  @@unique([supplierId, skuId])
   @@index([supplierId])
   @@index([name])
   @@map("product")
@@ -21,11 +30,25 @@ model ProductAttribute {
   attributeId String 
   product Product @relation(fields: [productId], references: [id])
   attribute Attribute @relation(fields: [attributeId], references: [id])
-  type AttributeType
   value Json
+  changeLog ProductAttributeChangeLog?
 
+  @@unique([productId, attributeId])
   @@index([productId, attributeId])
-  @@index([type])
   @@index([value], type: Gin)
   @@map("product_attribute")
+}
+
+// 1 to 1 relationship with ProductAttribute
+// to save row space as my free tier db have limited space.
+// Ideally, it should have a old/new field value and a 1 to many 
+// and there should be a cron job to clean up the change logs after a certain period of time.
+model ProductAttributeChangeLog {
+  productAttributeId String @id
+  productAttribute ProductAttribute @relation(fields: [productAttributeId], references: [id])
+  updatedAt DateTime @updatedAt
+  updatedBy ProductLastUpdatedBy?
+  updatedByReferenceId String?
+
+  @@map("product_attribute_change_log")
 }

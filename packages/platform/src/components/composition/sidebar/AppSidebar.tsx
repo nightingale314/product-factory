@@ -1,4 +1,4 @@
-import { Notebook, Sparkles, Store } from "lucide-react";
+import { CloudUpload, Notebook, Store } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,18 +20,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 const items = [
   {
     title: "Products",
-    url: routes.products,
+    url: routes.products.root,
     icon: Store,
+  },
+  {
+    title: "Import",
+    url: routes.import.products,
+    icon: CloudUpload,
   },
   {
     title: "Attributes",
     url: routes.attributes,
     icon: Notebook,
-  },
-  {
-    title: "Enrichment",
-    url: routes.enrichment,
-    icon: Sparkles,
   },
 ];
 

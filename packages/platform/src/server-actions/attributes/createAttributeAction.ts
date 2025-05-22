@@ -17,17 +17,29 @@ export async function createAttributeAction(
   try {
     const { user } = session;
     const supplierId = user.supplierId;
+
+    // Check for existing attribute with same name and type
+    const existingAttribute = await prisma.attribute.findFirst({
+      where: {
+        supplierId,
+        name: input.name,
+        type: input.type,
+      },
+    });
+
+    if (existingAttribute) {
+      return {
+        message: `Attribute "${input.name}" of type ${input.type} already exists. Please use a different name or type.`,
+        errorCode: ServerErrorCode.ATTRIBUTE_CONFLICT,
+        data: null,
+      };
+    }
+
     const response = await prisma.attribute.create({
       data: {
         ...input,
+        enrichmentEnabled: input.enrichmentEnabled ?? false,
         supplierId,
-        measureConfig: input.measureConfig
-          ? {
-              create: {
-                unit: input.measureConfig.unit,
-              },
-            }
-          : undefined,
       },
     });
 

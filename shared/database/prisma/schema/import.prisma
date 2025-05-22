@@ -1,0 +1,35 @@
+
+enum ProductImportStep {
+  MAPPING_SELECTION // Task contains mappings, pending user input.
+  MAPPING_GENERATION // Task is generating mappings
+  PRODUCT_IMPORT
+  COMPLETED
+}
+
+
+// mappings model
+// {
+  // row: string;
+  // columnIndex: number;
+  // matchedAttributeId: string | undefined;
+  // score: number;
+// }
+
+model ProductImportTask {
+  id String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  supplierId Int
+  fileKey String
+  step ProductImportStep?
+  mappings Json?
+  selectedHeaderIndex Int
+  totalProductsImported Int?
+  totalProductsSkipped Int?
+  aborted Boolean @default(false)
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+  rowWithIssues Json?
+
+  @@index([supplierId])
+  @@map("product_import_task")
+}

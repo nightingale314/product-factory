@@ -1,9 +1,10 @@
+"use client";
+
 import { DateTimeCell } from "@/components/composition/table/cells/datetime";
 import { TextCell } from "@/components/composition/table/cells/text";
 import { Button } from "@/components/ui/button";
 import { Attribute } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Check, X } from "lucide-react";
 import { useMemo } from "react";
 
 interface AttributeTableColumnsProps {
@@ -42,13 +43,9 @@ export const useAttributeTableColumns = ({
         accessorKey: "enrichmentEnabled",
         header: "Enrichable",
         cell: ({ row }) => {
-          const isRequired = !!row.original.required;
+          const isRequired = !!row.original.enrichmentEnabled;
 
-          if (isRequired) {
-            return <Check />;
-          }
-
-          return <X />;
+          return `${isRequired}`.toUpperCase();
         },
       },
       {

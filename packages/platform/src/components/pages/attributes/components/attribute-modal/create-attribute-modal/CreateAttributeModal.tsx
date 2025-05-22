@@ -55,8 +55,12 @@ export function CreateAttributeModal({
   };
 
   const handleOpenChange = (open: boolean) => {
+    form.reset({
+      type: AttributeType.SHORT_TEXT,
+      required: false,
+      enrichmentEnabled: true,
+    });
     if (!open) {
-      form.reset();
       setOpen(false);
     } else {
       setOpen(true);
