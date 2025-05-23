@@ -12,6 +12,29 @@ Fullstack app built with Next 15, Prisma, Postgres (NeonTech). Will use React 18
 
 ## Architecture
 
+### Frontend
+
+1. NextJS (FE + BFF)
+2. UI Library: Shadcn
+3. State management: Native react
+
+### Backend
+
+1. PostgresSQL (Deployed on NeonTech)
+2. Prisma as ORM
+3. Serverless framework for IaaC with AWS
+4. AWS SQS for Enrichment / Import service queues
+5. AWS Lambda
+6. AWS S3 for file storage
+
+### Auth
+
+1. Session token auth stored on DB. Validated on FE server.
+
+### Project structure
+
+1. Monorepo workspace setup with pnpm. (Very very difficult to setup because of Prisma binaries... T_T)
+
 ### Notes
 
 1. This proejct uses NextJS as the fullstack framework, alongside with AWS serverless services for long live tasks (Import service + Enrichment service). All components are in a monorepo setup. Due to lack of time, deployment for the BE services are done locally instead of in a pipeline. serverless framework is used for orchestrating the services via IaaC.
