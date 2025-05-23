@@ -110,6 +110,13 @@ export const Editor = ({
     onCancel();
   };
 
+  const handleOnClear = () => {
+    editor.update(() => {
+      const root = $getRoot();
+      root.clear();
+    });
+  };
+
   return (
     <div className="w-full">
       <div className="editor-container">
@@ -141,6 +148,9 @@ export const Editor = ({
           </Button>
           <Button size="sm" variant="ghost" onClick={handleOnCancel}>
             Cancel
+          </Button>
+          <Button size="sm" variant="ghost" onClick={handleOnClear}>
+            Clear
           </Button>
         </div>
       ) : null}
