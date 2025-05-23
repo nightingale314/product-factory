@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { Check } from "lucide-react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AttributeInputBaseType } from "./types";
+import Spinner from "@/components/ui/icons/Spinner";
 
 interface BooleanInputProps extends AttributeInputBaseType {
   onChange: (id: string, value: boolean | null) => Promise<boolean>;
@@ -28,6 +29,7 @@ export const BooleanInput = ({
 }: BooleanInputProps) => {
   const [displayValue, setDisplayValue] = useState<boolean>(formatValue(value));
   const validate = useValidator({ type, required: !!required });
+  const [isLoading, startTransition] = useTransition();
 
   const hasChanges = displayValue !== formatValue(value);
 
@@ -73,8 +75,17 @@ export const BooleanInput = ({
         />
         {hasChanges && (
           <>
-            <Button variant="ghost" size="icon" onClick={onSubmit}>
-              <Check className=" text-green-500" />
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isLoading}
+              onClick={() => startTransition(onSubmit)}
+            >
+              {isLoading ? (
+                <Spinner className="!size-6" />
+              ) : (
+                <Check className=" text-green-500" />
+              )}
             </Button>
             <Button variant="ghost" size="icon" onClick={handleOnCancel}>
               <X className=" text-black-500" />

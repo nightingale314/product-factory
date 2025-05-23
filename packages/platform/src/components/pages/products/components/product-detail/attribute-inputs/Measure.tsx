@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ import {
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AttributeInputBaseType } from "./types";
+import Spinner from "@/components/ui/icons/Spinner";
 
 interface MeasureInputProps extends AttributeInputBaseType {
   unitOptions: string[];
@@ -67,6 +68,7 @@ export const MeasureInput = ({
   lastUpdatedAt,
   unitOptions,
 }: MeasureInputProps) => {
+  const [isLoading, startTransition] = useTransition();
   const [displayValue, setDisplayValue] = useState<{
     value: string;
     unit: string;
@@ -158,8 +160,17 @@ export const MeasureInput = ({
         )}
         {hasChanges && (
           <>
-            <Button variant="ghost" size="icon" onClick={onSubmit}>
-              <Check className=" text-green-500" />
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isLoading}
+              onClick={() => startTransition(onSubmit)}
+            >
+              {isLoading ? (
+                <Spinner className="!size-6" />
+              ) : (
+                <Check className=" text-green-500" />
+              )}
             </Button>
             <Button variant="ghost" size="icon" onClick={handleOnCancel}>
               <X className=" text-black-500" />

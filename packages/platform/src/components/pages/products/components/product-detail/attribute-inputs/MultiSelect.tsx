@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useTransition } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
 import { toast } from "sonner";
@@ -6,6 +6,8 @@ import { useValidator } from "../../../hooks/useValidator";
 import { MultiAsyncSelect } from "@/components/ui/multi-select";
 import { debounce } from "lodash";
 import { AttributeInputBaseType } from "./types";
+import Spinner from "@/components/ui/icons/Spinner";
+import { cn } from "@/lib/utils";
 
 interface MultiSelectInputProps extends AttributeInputBaseType {
   options?: { label: string; value: string }[];
@@ -36,6 +38,7 @@ export const MultiSelectInput = ({
     formatValue(value)
   );
   const validate = useValidator({ type, required: !!required });
+  const [isLoading, startTransition] = useTransition();
 
   const debouncedOnSubmit = useCallback(
     debounce(async (updatedValue: string[]) => {
@@ -72,7 +75,15 @@ export const MultiSelectInput = ({
         value={displayValue}
         placeholder="Select a value"
         options={options ?? []}
-        onValueChange={debouncedOnSubmit}
+        onValueChange={(value) =>
+          startTransition(() => debouncedOnSubmit(value))
+        }
+      />
+      <Spinner
+        className={cn(
+          "ml-2 text-gray-400 !size-6 opacity-0",
+          isLoading && "opacity-100"
+        )}
       />
     </InputWrapper>
   );
