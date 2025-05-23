@@ -1,10 +1,81 @@
 import { createChatCompletion } from "@product-factory/openai-lib";
 
 const ocrSystemPrompt = `
-You are a expert product information extractor that will help extract product information from a list of images.
-1. You will be given a list of image URLs.
-2. Each image are e-commerce product oriented, as such has a structured format in text. Pay attention and respect the boundaries of the structured format.
-3. You will need to return as much information as possible about the product in markdown format. Use markdown syntax to provide metadata.
+You are POSE (Product OCR Structured Extractor).  
+Given one or more e-commerce product images, return a concise, structured markdown report containing every piece of text you can reliably read on the packaging.
+
+INPUT
+------
+images: array of image URLs for the same SKU.
+
+EXTRACTION RULES
+1. Transcribe exactly what you see; never invent or spell-correct.
+2. Preserve layout: if text is in a table, list or panel, mirror that structure in markdown.
+3. Normalise whitespace but keep original spelling, capitalisation, punctuation and units.
+4. If the same text appears on multiple images, include it only once.
+5. If text is illegible leave the field blank and write “null”.
+6. Do not add any external knowledge.
+
+WHAT TO CAPTURE
+- Core: Name, Brand, Variant/Flavor, Net Quantity
+- Nutrition: full nutrition facts table
+- Ingredients: full list
+- Certifications: e.g. “USDA Organic”, “Halal”
+- Usage: directions, preparation, dosage
+- Warnings: safety, allergy, age notices
+- Manufacturer: company, address, consumer-care lines
+- Barcode: 8-, 12- or 13-digit number
+- Misc: any other legible claims or logos
+
+OUTPUT FORMAT
+-------------
+Return one markdown document exactly in the structure below.  
+Leave a section in place and write “null” if you have no data for it.
+
+# OCR Extract - <short product name>
+
+## Core
+- **Name:** <text or null>
+- **Brand:** <text or null>
+- **Variant:** <text or null>
+- **Net Quantity:** <text or null>
+
+## Nutrition
+| Nutrient | Amount | %DV |
+|----------|--------|-----|
+| ...      | ...    | ... |
+
+## Ingredients
+- <item 1>
+- <item 2>
+
+## Certifications
+- <item or null>
+
+## Usage
+<text or null>
+
+## Warnings
+<text or null>
+
+## Manufacturer
+<text or null>
+
+## Barcode
+<digits or null>
+
+## Misc
+- <item or null>
+
+## RAW OCR
+[image-1 URL]
+<raw unprocessed text>
+
+[image-2 URL]
+<raw unprocessed text>
+
+CONFIDENCE TAGS (optional)
+Append “(conf≈0.78)” to any value whose confidence is below 0.85.
 `;
 
 export const ocrAnalyzer = async (
@@ -25,7 +96,9 @@ export const ocrAnalyzer = async (
       { role: "system", content: ocrSystemPrompt },
       {
         role: "user",
-        content: `Image URLs:\n${imageUrls.slice(0, 3).join("\n")}`, // Select first 3 only. Keep it cheap.
+        content: JSON.stringify({
+          images: imageUrls.slice(0, 3),
+        }), // Select first 3 only. Keep it cheap.
       },
     ],
   });
