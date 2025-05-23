@@ -47,11 +47,11 @@ export const useUpdateProduct = (
       updatedProductResponse.errorCode !== ServerErrorCode.SUCCESS ||
       !updatedProductResponse.data
     ) {
-      toast.error(`Failed to update attribute "${name}"`);
+      toast.error(`Failed to update attribute "${attribute?.name}"`);
       return null;
     }
 
-    toast.success(`Attribute "${name}" updated`);
+    toast.success(`Attribute "${attribute?.name}" updated`);
     onUpdateSuccess?.(updatedProductResponse.data);
 
     return updatedProductResponse.data;
