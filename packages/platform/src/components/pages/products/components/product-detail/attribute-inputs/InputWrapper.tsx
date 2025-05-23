@@ -32,7 +32,7 @@ export const InputWrapper = ({
         ) : null}
       </div>
 
-      <div className="flex items-end">{children}</div>
+      <div className="flex items-center">{children}</div>
     </div>
   );
 };

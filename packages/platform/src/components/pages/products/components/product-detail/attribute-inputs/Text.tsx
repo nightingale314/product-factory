@@ -1,12 +1,14 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { AttributeType } from "@prisma/client";
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
 import { toast } from "sonner";
 import { useValidator } from "../../../hooks/useValidator";
 import { AttributeInputBaseType } from "./types";
+import Spinner from "@/components/ui/icons/Spinner";
+import { cn } from "@/lib/utils";
 
 interface TextInputProps extends AttributeInputBaseType {
   onChange: (id: string, value: string | null) => Promise<boolean>;
@@ -26,6 +28,7 @@ export const TextInput = ({
   lastUpdatedAt,
 }: TextInputProps) => {
   const [displayValue, setDisplayValue] = useState(formatValue(value) ?? "");
+  const [isLoading, startTransition] = useTransition();
   const validate = useValidator({ type, required: !!required });
 
   const onSubmit = async () => {
@@ -61,7 +64,7 @@ export const TextInput = ({
           id={id}
           value={displayValue}
           onChange={(e) => setDisplayValue(e.target.value)}
-          onBlur={onSubmit}
+          onBlur={() => startTransition(onSubmit)}
         />
       </InputWrapper>
     );
@@ -79,7 +82,13 @@ export const TextInput = ({
         id={id}
         value={displayValue}
         onChange={(e) => setDisplayValue(e.target.value)}
-        onBlur={onSubmit}
+        onBlur={() => startTransition(onSubmit)}
+      />
+      <Spinner
+        className={cn(
+          "ml-2 text-gray-400 !size-6 opacity-0",
+          isLoading && "opacity-100"
+        )}
       />
     </InputWrapper>
   );

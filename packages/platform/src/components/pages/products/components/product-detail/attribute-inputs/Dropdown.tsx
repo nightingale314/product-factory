@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
 import { toast } from "sonner";
@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AttributeInputBaseType } from "./types";
+import { cn } from "@/lib/utils";
+import Spinner from "@/components/ui/icons/Spinner";
 
 interface DropdownInputProps extends AttributeInputBaseType {
   options?: { label: string; value: string }[];
@@ -39,6 +41,7 @@ export const DropdownInput = ({
   const [loading, setLoading] = useState(false);
   const [displayValue, setDisplayValue] = useState<string>(formatValue(value));
   const validate = useValidator({ type, required: !!required });
+  const [isLoading, startTransition] = useTransition();
 
   const onSubmit = async () => {
     if (displayValue === formatValue(value)) return;
@@ -75,7 +78,10 @@ export const DropdownInput = ({
         value={displayValue}
         onValueChange={(value) => setDisplayValue(value)}
       >
-        <SelectTrigger onBlur={onSubmit} disabled={loading}>
+        <SelectTrigger
+          onBlur={() => startTransition(onSubmit)}
+          disabled={loading}
+        >
           <SelectValue placeholder="Select a value" />
         </SelectTrigger>
         <SelectContent>
@@ -86,6 +92,12 @@ export const DropdownInput = ({
           ))}
         </SelectContent>
       </Select>
+      <Spinner
+        className={cn(
+          "ml-2 text-gray-400 !size-6 opacity-0",
+          isLoading && "opacity-100"
+        )}
+      />
     </InputWrapper>
   );
 };

@@ -1,10 +1,12 @@
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { useState } from "react";
 import { InputWrapper } from "./InputWrapper";
 import { toast } from "sonner";
 import { useValidator } from "../../../hooks/useValidator";
 import { AttributeInputBaseType } from "./types";
+import { cn } from "@/lib/utils";
+import Spinner from "@/components/ui/icons/Spinner";
 
 interface NumberInputProps extends AttributeInputBaseType {
   onChange: (id: string, value: string | null) => Promise<boolean>;
@@ -25,6 +27,7 @@ export const NumberInput = ({
 }: NumberInputProps) => {
   const [displayValue, setDisplayValue] = useState(formatValue(value) ?? "");
   const validate = useValidator({ type, required: !!required });
+  const [isLoading, startTransition] = useTransition();
 
   const onSubmit = async () => {
     if (displayValue === formatValue(value)) return;
@@ -61,7 +64,13 @@ export const NumberInput = ({
         onChange={(e) => {
           setDisplayValue(e.target.value);
         }}
-        onBlur={onSubmit}
+        onBlur={() => startTransition(onSubmit)}
+      />
+      <Spinner
+        className={cn(
+          "ml-2 text-gray-400 !size-6 opacity-0",
+          isLoading && "opacity-100"
+        )}
       />
     </InputWrapper>
   );
